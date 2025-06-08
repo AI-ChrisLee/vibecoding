@@ -23,6 +23,13 @@ const config = {
         "primary-foreground": "var(--primary-foreground)",
         background: "var(--background)",
         foreground: "var(--foreground)",
+        'headline-purple': '#6246ff',
+      },
+      fontSize: {
+        body: ['1rem', { lineHeight: '1.75rem' }],
+      },
+      fontWeight: {
+        body: '400',
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -31,6 +38,9 @@ const config = {
       },
       fontFamily: {
         sans: ["var(--font-inter)"],
+      },
+      maxWidth: {
+        section: '700px',
       },
     },
   },
