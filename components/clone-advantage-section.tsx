@@ -19,7 +19,7 @@ export default function CloneAdvantageSection() {
         <p>Perspective.co raised $8M with a landing page.</p>
         <p>Jenny.ai hit $2M ARR with basic AI features.</p>
         <p>Linear reached a $50M valuation with clean UI.</p>
-        <p>You don't need to invent. You need to execute better.</p>
+        <p>You don&apos;t need to invent. You need to execute better.</p>
       </div>
       {/* Checkmark list */}
       <ul className="space-y-2 mb-6">

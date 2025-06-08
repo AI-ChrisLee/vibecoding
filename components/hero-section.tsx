@@ -4,7 +4,6 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 
 // ToolStack: pill badges for tech stack
 function ToolStack({ tools }: { tools: string[] }) {
