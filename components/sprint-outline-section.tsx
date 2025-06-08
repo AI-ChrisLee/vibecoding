@@ -50,11 +50,10 @@ function WeekCard({
   title,
   subtitle,
   imgAlt,
-  imgSrc,
   ships,
   todos,
   success,
-}: typeof weeks[number]) {
+}: Omit<typeof weeks[number], 'imgSrc'>) {
   return (
     <div className="bg-white rounded-xl shadow p-6 mb-8">
       <div className="flex items-center gap-2 mb-2">
