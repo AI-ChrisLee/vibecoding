@@ -12,14 +12,14 @@ export default function RealitySection() {
       </div>
       {/* Headline */}
       <h2 className="text-3xl md:text-4xl font-black text-foreground mb-6">
-        You&apos;ve been &quot;learning to code&quot; for how long now?
+        You&rsquo;ve been &quot;learning to code&quot; for how long now?
       </h2>
       {/* Body paragraphs */}
       <div className="space-y-4 text-lg text-foreground/80">
         <p>Watching YouTube tutorials. Buying courses. Bookmarking GitHub repos.</p>
         <p>Meanwhile, 12-year-olds are shipping profitable apps with AI.</p>
-        <p>The game changed. You&apos;re still playing by old rules.</p>
-        <p>VibeCoding isn&apos;t another course. It&apos;s a 21-day clone sprint where excuses go to die and apps get shipped.</p>
+        <p>The game changed. You&rsquo;re still playing by old rules.</p>
+        <p>VibeCoding isn&rsquo;t another course. It&rsquo;s a 21-day clone sprint where excuses go to die and apps get shipped.</p>
       </div>
     </section>
   );

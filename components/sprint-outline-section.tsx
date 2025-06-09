@@ -4,7 +4,7 @@ const weeks = [
   {
     emoji: "📢",
     title: "Week 1: One-Page Magnet",
-    subtitle: "Clone Perspective&apos;s venture-backable hero",
+    subtitle: "Clone Perspective&rsquo;s venture-backable hero",
     imgAlt: "Week 1 dummy",
     ships: "Public landing page + working waitlist",
     todos: [
@@ -23,20 +23,20 @@ const weeks = [
     todos: [
       "Turn on magic-link auth",
       "Protect /dashboard route (Next.js middleware)",
-      "Show &apos;Hi {Name}, you&apos;re in!&apos;—that&apos;s it",
+      "Show &lsquo;Hi {Name}, you&rsquo;re in!&rsquo;—that&rsquo;s it",
     ],
     success: "First protected login works on any device",
   },
   {
     emoji: "🤖",
     title: "Week 3: One-Click AI Trick",
-    subtitle: "Ship Jenny.ai&apos;s cash-generating MVP",
+    subtitle: "Ship Jenny.ai&rsquo;s cash-generating MVP",
     imgAlt: "Week 3 dummy",
     ships: "Jenny-style AI endpoint + Stripe paywall",
     todos: [
       "Build /api/ask → forwards prompt to OpenAI",
       "Wrap $5 credit pack in Stripe Checkout",
-      "Textarea — &apos;Ask&apos; button — answer + decrement credits",
+      "Textarea — &lsquo;Ask&rsquo; button — answer + decrement credits",
     ],
     success: "First real Stripe payment + AI response recorded",
   },
