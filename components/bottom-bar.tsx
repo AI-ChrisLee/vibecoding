@@ -19,7 +19,7 @@ export default function BottomBar() {
         className="w-16 h-16 rounded-full overflow-hidden border border-muted mb-2 shadow"
       >
         <Image
-          src="/assets/profile-100.png"
+          src="/assets/Profile.png"
           alt="AI Chris Lee"
           width={64}
           height={64}

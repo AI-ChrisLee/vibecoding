@@ -17,7 +17,7 @@ export default function VibeCodingRegister() {
     setLoading(true);
     setSuccess(false);
     const { error } = await supabase.from("leads").insert([
-      { name, email, created_at: new Date().toISOString() },
+      { name, email, created_at: new Date().toISOString(), status: "pending", Payment: false },
     ]);
     setLoading(false);
     if (error) {
