@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 
 export default function ThanksPage() {
   const [loading, setLoading] = useState(true);
-  const [allowed, setAllowed] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -24,9 +23,7 @@ export default function ThanksPage() {
         .eq("email", user.email)
         .single();
 
-      if (lead?.status === "paid") {
-        setAllowed(true);
-      } else {
+      if (!lead?.status || lead.status !== "paid") {
         router.replace("/pay");
       }
       setLoading(false);
