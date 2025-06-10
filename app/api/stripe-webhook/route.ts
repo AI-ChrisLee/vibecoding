@@ -7,11 +7,12 @@ const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(req: Request) {
   const sig = req.headers.get("stripe-signature") as string;
-  const rawBody = await req.text();
+  const rawBody = await req.arrayBuffer();
+  const buf = Buffer.from(rawBody);
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret);
+    event = stripe.webhooks.constructEvent(buf, sig, endpointSecret);
   } catch {
     return NextResponse.json({ error: "Webhook signature verification failed" }, { status: 400 });
   }
