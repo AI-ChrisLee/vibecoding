@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
 
 export default function VibeCodingRegister() {
   const [email, setEmail] = useState("");
@@ -10,7 +9,6 @@ export default function VibeCodingRegister() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +16,7 @@ export default function VibeCodingRegister() {
     setMessage(null);
 
     // 1. Sign up with magic link
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {

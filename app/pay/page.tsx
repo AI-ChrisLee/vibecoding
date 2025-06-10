@@ -7,26 +7,24 @@ import { useRouter } from "next/navigation";
 export default function PayPage() {
   const [loading, setLoading] = useState(true);
   const [paid, setPaid] = useState(false);
-  const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
     const checkStatus = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data } = await supabase.auth.getUser();
+      const user = data.user;
       if (!user) {
         router.replace("/vibecoding-register");
         return;
       }
-      setUser(user);
-
       // Check payment status in leads
-      const { data, error } = await supabase
+      const { data: lead } = await supabase
         .from("leads")
         .select("status")
         .eq("email", user.email)
         .single();
 
-      if (data?.status === "paid") {
+      if (lead?.status === "paid") {
         setPaid(true);
         router.replace("/thanks");
       } else {
