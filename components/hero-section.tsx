@@ -4,18 +4,25 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 // ToolStack: pill badges for tech stack
 function ToolStack({ tools }: { tools: string[] }) {
   return (
     <div className="flex gap-2 mb-2 justify-center">
-      {tools.map((tool) => (
-        <Badge
+      {tools.map((tool, i) => (
+        <motion.div
           key={tool}
-          className="border border-black text-black bg-transparent rounded-full px-4 py-1 text-sm transition-transform duration-200 hover:scale-105 hover:border-primary hover:text-primary cursor-pointer"
+          initial={{ opacity: 0, y: 16, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.1 + i * 0.08, duration: 0.4, type: "spring" }}
         >
-          {tool}
-        </Badge>
+          <Badge
+            className="border border-black text-black bg-white/70 backdrop-blur rounded-full px-4 py-1 text-sm transition-transform duration-200 hover:scale-105 hover:border-primary hover:text-primary cursor-pointer shadow-sm"
+          >
+            {tool}
+          </Badge>
+        </motion.div>
       ))}
     </div>
   );
@@ -24,20 +31,26 @@ function ToolStack({ tools }: { tools: string[] }) {
 // HeroImage: hero image/gif
 function HeroImage({ src, alt }: { src: string; alt: string }) {
   return (
-    <div className="w-full max-w-md aspect-[4/3] bg-gray-100 rounded-2xl shadow-md flex items-center justify-center overflow-hidden mx-auto mt-4">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.7, ease: "easeOut" }}
+      className="w-full max-w-md bg-white/80 rounded-2xl shadow-xl flex items-center justify-center overflow-hidden mx-auto mt-4 backdrop-blur"
+      whileHover={{ scale: 1.015 }}
+    >
       <Image
         src={src}
         alt={alt}
-        width={530}
-        height={352}
+        width={400}
+        height={300}
         className="object-cover w-full h-full"
         priority
       />
-    </div>
+    </motion.div>
   );
 }
 
-// SSR-safe Timer
+// SSR-safe Timer with animated digits
 function Timer({ targetDate }: { targetDate: Date }) {
   const [mounted, setMounted] = useState(false);
   const [time, setTime] = useState(getTimeLeft(targetDate));
@@ -53,9 +66,30 @@ function Timer({ targetDate }: { targetDate: Date }) {
   return (
     <div className="flex flex-col items-center gap-1 mt-4">
       <span className="text-base text-black">
-        Enrollment closes in <span className="font-bold">{days}</span> days, <span className="font-bold">{hours}</span> hours, <span className="font-bold">{minutes}</span> mins, and <span className="font-bold">{seconds}</span> seconds.
+        Enrollment closes in
+        <AnimatedDigit value={days} /> days,
+        <AnimatedDigit value={hours} /> hours,
+        <AnimatedDigit value={minutes} /> mins, and
+        <AnimatedDigit value={seconds} /> seconds.
       </span>
     </div>
+  );
+}
+
+function AnimatedDigit({ value }: { value: number }) {
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.span
+        key={value}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.3 }}
+        className="font-bold inline-block min-w-[2ch]"
+      >
+        {value}
+      </motion.span>
+    </AnimatePresence>
   );
 }
 
@@ -76,24 +110,58 @@ function getTimeLeft(targetDate: Date) {
 // Main HeroSection
 export default function HeroSection() {
   return (
-    <section className="w-full max-w-2xl mx-auto px-4 py-12 flex flex-col items-center gap-4 text-center font-sans">
+    <motion.section
+      initial={{ opacity: 0, y: 32 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, ease: "easeOut" }}
+      className="w-full max-w-2xl mx-auto px-4 py-16 flex flex-col items-center gap-6 text-center font-sans relative"
+    >
       <ToolStack tools={["Cursor", "Supabase", "Vercel", "Git"]} />
       {/* Vibe Coding Masterclass label */}
-      <div className="text-primary font-semibold text-base mb-1">Vibe Coding Masterclass:</div>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+        className="text-primary font-semibold text-base mb-1"
+      >
+        Vibe Coding Masterclass:
+      </motion.div>
       {/* Title */}
-      <h1 className="text-4xl md:text-5xl font-black leading-tight text-center font-sans">
+      <motion.h1
+        initial={{ opacity: 0, y: 32 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.7, ease: "easeOut" }}
+        className="text-4xl md:text-5xl font-black leading-tight text-center font-sans"
+      >
         Clone $10M AI SaaS Products in 21 Days.
-      </h1>
+      </motion.h1>
       {/* Date range under title */}
-      <div className="text-base text-muted-foreground mt-1 mb-2">July 11 ~ Aug 1 Fri PST 10AM </div>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+        className="text-base text-muted-foreground mt-1 mb-2"
+      >
+        July 11 ~ Aug 1 Fri PST
+      </motion.div>
       {/* Hero GIF */}
       <HeroImage src="/assets/Hero.png" alt="Demo of the clone sprint" />
       {/* Timer under hero image */}
       <Timer targetDate={new Date("2025-07-11T17:00:00Z")} />
       {/* CTA */}
-      <Button size="lg" className="text-base font-bold shadow-lg px-8 py-2 mt-2 mx-auto font-sans transition-transform duration-200 hover:scale-105 cursor-pointer">
-        Join The Clone Sprint
-      </Button>
-    </section>
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+        className="w-full flex justify-center"
+      >
+        <a
+          href="/vibecoding-register"
+          className="text-base font-bold shadow-lg px-8 py-2 mt-2 mx-auto font-sans transition-transform duration-200 hover:scale-105 cursor-pointer bg-primary text-white rounded-full"
+        >
+          Join the Clone Sprint
+        </a>
+      </motion.div>
+    </motion.section>
   );
 } 
