@@ -126,6 +126,12 @@
   }
 }
 
+@layer components {
+  .badge-outline-gray {
+    @apply inline-flex items-center px-4 py-1 rounded-full border border-gray-300 text-gray-500 text-sm font-semibold bg-transparent;
+  }
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

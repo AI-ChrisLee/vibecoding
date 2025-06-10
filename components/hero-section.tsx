@@ -113,54 +113,69 @@ export default function HeroSection() {
       initial={{ opacity: 0, y: 32 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
-      className="w-full max-w-2xl mx-auto px-4 py-16 flex flex-col items-center gap-6 text-center font-sans relative"
+      className="w-full max-w-2xl mx-auto px-4 py-12 flex flex-col items-center text-center font-sans relative"
     >
-      <ToolStack tools={["Cursor", "Supabase", "Vercel", "Git"]} />
-      {/* Vibe Coding Masterclass label */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-        className="text-primary font-semibold text-base mb-1"
-      >
-        Vibe Coding Masterclass:
-      </motion.div>
-      {/* Title */}
-      <motion.h1
-        initial={{ opacity: 0, y: 32 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.7, ease: "easeOut" }}
-        className="text-4xl md:text-5xl font-black leading-tight text-center font-sans"
-      >
-          Clone $10M AI SaaS Products in 21 Days.
-      </motion.h1>
-      {/* Date range under title */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
-        className="text-base text-muted-foreground mt-1 mb-2"
-      >
-        July 11 ~ Aug 1 Fri PST
-      </motion.div>
-      {/* Hero GIF */}
-      <HeroImage src="/assets/Hero.png" alt="Demo of the clone sprint" />
-      {/* Timer under hero image */}
-      <Timer targetDate={new Date("2025-07-11T17:00:00Z")} />
-      {/* CTA */}
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-        className="w-full flex justify-center"
-      >
-        <a
-          href="/vibecoding-register"
-          className="text-base font-bold shadow-lg px-8 py-2 mt-2 mx-auto font-sans transition-transform duration-200 hover:scale-105 cursor-pointer bg-primary text-white rounded-full"
+      {/* Grouped hero content for tighter hierarchy */}
+      <div className="flex flex-col items-center gap-1 mb-4">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.4 }}
+          className="text-primary font-bold text-sm tracking-wide uppercase mb-0"
         >
-          Join the Clone Sprint
-        </a>
-      </motion.div>
+          The Vibe Coding Masterclass
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.18, duration: 0.4 }}
+          className="text-xs text-muted-foreground mb-1"
+        >
+          July 11 - August 1, 2025
+        </motion.div>
+        <motion.h1
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22, duration: 0.6, ease: "easeOut" }}
+          className="text-3xl md:text-4xl font-black leading-tight mb-1"
+        >
+          Vibe Coding Proven Winners Into Your Winning Apps in 21 Days
+        </motion.h1>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.28, duration: 0.4 }}
+          className="text-base text-muted-foreground mb-2"
+        >
+          Stop building from scratch. Start cloning success.
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.32, duration: 0.4 }}
+          className="w-full flex justify-center mb-2"
+        >
+          <a
+            href="/signup"
+            className="text-base font-bold shadow-lg px-8 py-2 font-sans transition-transform duration-200 hover:scale-105 cursor-pointer bg-primary text-white rounded-full"
+          >
+            Join The Clone Accelerator →
+          </a>
+        </motion.div>
+      </div>
+      {/* Hero image */}
+      <HeroImage src="/assets/Hero.png" alt="Demo of the clone sprint" />
+      {/* Tool badges at the bottom */}
+      <div className="flex gap-2 justify-center mt-6">
+        {['Cursor AI', 'Supabase', 'Vercel', 'git'].map((tool) => (
+          <span
+            key={tool}
+            className="badge-outline-gray"
+          >
+            {tool}
+          </span>
+        ))}
+      </div>
     </motion.section>
   );
 } 

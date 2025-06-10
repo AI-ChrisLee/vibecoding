@@ -1,26 +1,34 @@
 "use client";
 
+import { motion } from "framer-motion";
+import { fadeInUp } from "@/components/clone-section";
+
 export default function RealitySection() {
   return (
-    <section className="w-full max-w-3xl mx-auto px-4 py-12">
+    <motion.section
+      initial={fadeInUp.initial}
+      animate={fadeInUp.animate}
+      transition={fadeInUp.transition}
+      className="w-full max-w-2xl mx-auto px-4 py-12 flex flex-col items-start text-left"
+    >
       {/* Step badge */}
-      <div className="flex items-center gap-2 mb-4">
-        <span className="inline-flex items-center px-3 py-1 rounded-full border border-black text-black bg-transparent text-sm font-medium">
-          <span className="font-mono text-xs font-semibold mr-2">01</span>
-          Reality Check
+      <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.1 }} className="flex items-center gap-2 mb-4">
+        <span className="badge-outline-gray font-semibold">
+          <span className="font-mono text-xs font-bold mr-2">01</span>
+          The Brutal Truth
         </span>
-      </div>
+      </motion.div>
       {/* Headline */}
-      <h2 className="text-3xl md:text-4xl font-black text-foreground mb-6">
-        You&rsquo;ve been &quot;learning to code&quot; for how long now?
-      </h2>
+      <motion.h2 {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.18 }} className="text-2xl md:text-3xl font-black text-foreground mb-4 leading-tight">
+        You&apos;ve been "learning to code" for months (maybe years).
+      </motion.h2>
       {/* Body paragraphs */}
-      <div className="space-y-4 text-lg text-foreground/80">
-        <p>Watching YouTube tutorials. Buying courses. Bookmarking GitHub repos.</p>
-        <p>Meanwhile, 12-year-olds are shipping profitable apps with AI.</p>
-        <p>The game changed. You&rsquo;re still playing by old rules.</p>
-        <p>VibeCoding isn&rsquo;t another course. It&rsquo;s a 21-day clone sprint where excuses go to die and apps get shipped.</p>
-      </div>
-    </section>
+      <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.25 }} className="space-y-3 text-base text-muted-foreground max-w-xl">
+        <p>Watching tutorials. Buying courses. Building todo apps nobody wants.</p>
+        <p>Meanwhile, smart builders are cloning $10M+ products and shipping in weeks.</p>
+        <p className="font-bold text-foreground">The winners don&apos;t innovate. They execute better.</p>
+        <p>You don&apos;t need original ideas. You need proven blueprints + fast execution.</p>
+      </motion.div>
+    </motion.section>
   );
 } 

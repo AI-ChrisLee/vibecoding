@@ -12,20 +12,20 @@ export default function ThanksPage() {
     const checkStatus = async () => {
       const { data } = await supabase.auth.getUser();
       const user = data.user;
-      if (!user) {
-        router.replace("/vibecoding-register");
-        return;
-      }
+      // if (!user) {
+      //   router.replace("/signup");
+      //   return;
+      // }
       // Check payment status in leads
       const { data: lead } = await supabase
         .from("leads")
         .select("status")
-        .eq("email", user.email)
+        .eq("email", user?.email)
         .single();
 
-      if (!lead?.status || lead.status !== "paid") {
-        router.replace("/pay");
-      }
+      // if (!lead?.status || lead.status !== "paid") {
+      //   router.replace("/pay");
+      // }
       setLoading(false);
     };
     checkStatus();
@@ -35,8 +35,12 @@ export default function ThanksPage() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold mb-4">Thank You!</h1>
-      <p className="text-lg">Your payment is confirmed. Welcome to the Vibe Sprint!</p>
+      <h1 className="text-3xl font-bold mb-4">You're In!</h1>
+      <p className="text-lg text-center max-w-xl">
+        Welcome to the Vibe Coding Masterclass.<br />
+        3 weeks. 3 apps. Zero excuses.<br />
+        <b>Check your email for next steps and join the community!</b>
+      </p>
     </main>
   );
 }

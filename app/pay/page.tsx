@@ -13,15 +13,15 @@ export default function PayPage() {
     const checkStatus = async () => {
       const { data } = await supabase.auth.getUser();
       const user = data.user;
-      if (!user) {
-        router.replace("/vibecoding-register");
-        return;
-      }
+      // if (!user) {
+      //   router.replace("/signup");
+      //   return;
+      // }
       // Check payment status in leads
       const { data: lead } = await supabase
         .from("leads")
         .select("status")
-        .eq("email", user.email)
+        .eq("email", user?.email)
         .single();
 
       if (lead?.status === "paid") {
@@ -37,7 +37,6 @@ export default function PayPage() {
 
   const handleStripe = async () => {
     setLoading(true);
-    // Call your backend to create a Stripe Checkout session
     const res = await fetch("/api/checkout", { method: "POST" });
     const { url } = await res.json();
     window.location.href = url;
@@ -47,7 +46,13 @@ export default function PayPage() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold mb-4">Complete Your Payment</h1>
+      <h1 className="text-3xl font-bold mb-4">Secure Your Spot in the Clone Sprint</h1>
+      <p className="mb-6 text-center max-w-xl">
+        <b>Stop Innovating. Start Cloning.</b> <br />
+        Clone $10M AI SaaS Product in 21 Days. <br />
+        3 weeks. 3 apps. Zero excuses. <br />
+        <b>Investment: $799</b>
+      </p>
       {!paid && (
         <button
           onClick={handleStripe}
