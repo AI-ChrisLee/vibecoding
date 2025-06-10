@@ -8,13 +8,13 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import Image from "next/image";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 function CheckoutFormInner() {
   const stripe = useStripe();
   const elements = useElements();
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -22,8 +22,7 @@ function CheckoutFormInner() {
 
   useEffect(() => {
     fetch("/api/create-payment-intent", { method: "POST" })
-      .then(res => res.json())
-      .then(data => setClientSecret(data.clientSecret));
+      .then(res => res.json());
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -89,7 +88,7 @@ function CheckoutFormInner() {
         By signing up, you agree to our <a href="#" className="underline">terms</a>.
       </div>
       <div className="flex flex-col items-center mt-2">
-        <img src="/stripe-badges.png" alt="Stripe secure checkout" className="h-6" />
+        <Image src="/stripe-badges.png" alt="Stripe secure checkout" className="h-6" width={120} height={24} />
       </div>
       {error && <div className="text-red-600 text-sm text-center mt-2">{error}</div>}
     </form>

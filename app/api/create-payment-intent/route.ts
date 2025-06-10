@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   // For UI only, return a fixed amount (e.g., $39900 = $399.00)
   try {
     const paymentIntent = await stripe.paymentIntents.create({
