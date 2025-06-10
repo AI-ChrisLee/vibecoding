@@ -24,7 +24,7 @@ export default function VibeCodingRegister() {
       setError("Failed to register. Please try again.");
     } else {
       setSuccess(true);
-      window.open("https://buy.stripe.com/6oUbJ22epaEV5zW8r4cjS00", "_blank");
+      window.open("https://buy.stripe.com/test_6oUbJ22epaEV5zW8r4cjS00", "_blank");
     }
   };
 
