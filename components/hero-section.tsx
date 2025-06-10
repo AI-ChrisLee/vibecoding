@@ -132,7 +132,7 @@ export default function HeroSection() {
         transition={{ delay: 0.3, duration: 0.7, ease: "easeOut" }}
         className="text-4xl md:text-5xl font-black leading-tight text-center font-sans"
       >
-        Clone $10M AI SaaS Products in 21 Days.
+          Clone $10M AI SaaS Products in 21 Days.
       </motion.h1>
       {/* Date range under title */}
       <motion.div
