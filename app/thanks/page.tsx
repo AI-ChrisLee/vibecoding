@@ -11,31 +11,30 @@ export default function ThanksPage() {
   } | null>(null);
 
   useEffect(() => {
-    // Get user data from localStorage or API
-    const userData = {
-      name: 'New Member',
-      email: 'user@example.com'
-    };
-    setUser(userData);
+    // Get user data from localStorage
+    const storedUserData = localStorage.getItem('currentUser');
+    const paymentCompleted = localStorage.getItem('paymentCompleted');
     
-    // Check payment status - if not paid, redirect to pay page
-    const checkPayment = async () => {
-      try {
-        const response = await fetch(`/api/check-payment?email=${encodeURIComponent(userData.email)}`);
-        const result = await response.json();
-        
-        if (!result.hasPaid) {
-          // Redirect to pay page if not paid
-          window.location.href = '/pay';
-          return;
-        }
-      } catch (error) {
-        console.error('Payment check failed:', error);
-        // On error, allow access to thanks page
-      }
-    };
+    if (storedUserData) {
+      const userData = JSON.parse(storedUserData);
+      setUser({
+        name: userData.full_name || userData.name || 'New Member',
+        email: userData.email || 'user@example.com'
+      });
+    } else {
+      setUser({
+        name: 'New Member',
+        email: 'user@example.com'
+      });
+    }
     
-    checkPayment();
+    // Check if payment was completed, if not redirect to pay page
+    if (!paymentCompleted) {
+      console.log('No payment completed, redirecting to pay page');
+      setTimeout(() => {
+        window.location.href = '/pay';
+      }, 2000); // Give 2 seconds to show the page before redirect
+    }
   }, []);
 
   return (

@@ -68,9 +68,22 @@ export default function SignupPage() {
 
       if (result.success) {
         setMessage("Account created! Redirecting to payment...");
-        // Redirect to pay page after 1 second
+        
+        // Store user data for the pay page
+        const userData = {
+          full_name: fullName,
+          email: email,
+          name: fullName
+        };
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+        
+        // Redirect to pay page with user data
         setTimeout(() => {
-          router.push("/pay");
+          const params = new URLSearchParams({
+            email: email,
+            name: fullName
+          });
+          router.push(`/pay?${params.toString()}`);
         }, 1000);
       } else {
         setMessage(result.error || "Failed to create account. Please try again.");
