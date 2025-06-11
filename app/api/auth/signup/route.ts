@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
       password,
-      email_confirm: false,
+      email_confirm: true, // Auto-confirm email for better UX
       user_metadata: {
         full_name: full_name
       }
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         email,
         full_name,
         onboarding_step: 1,
-        email_confirmed: false,
+        email_confirmed: true,
         is_active: true
       })
       .select()

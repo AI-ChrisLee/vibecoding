@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import SignupHeader from "@/components/ui/signup-header";
 import StripePaymentForm from "@/components/stripe-payment-form";
+import DebugStripe from "@/components/debug-stripe";
+import { useAuth } from "@/hooks/useAuth";
 
 
 const bonuses = [
@@ -18,53 +21,46 @@ const bonuses = [
 
 export default function PayPage() {
   const [profileOpen, setProfileOpen] = useState(false);
-
-  const [user, setUser] = useState({ name: "Loading...", email: "loading..." });
   const [selectedPlan, setSelectedPlan] = useState("one-time");
+  const router = useRouter();
+  const { profile, loading, isAuthenticated, signOut, checkHasPaid } = useAuth();
 
-  // Get user data on component mount
+  // Redirect to login if not authenticated
   useEffect(() => {
-    const getUserData = async () => {
-      try {
-        // First try to get user data from localStorage (from signup)
-        const storedUserData = localStorage.getItem('currentUser');
-        if (storedUserData) {
-          const userData = JSON.parse(storedUserData);
-          setUser({
-            name: userData.full_name || userData.name,
-            email: userData.email
-          });
-          return;
-        }
+    if (!loading && !isAuthenticated) {
+      router.push('/login');
+      return;
+    }
 
-        // If no stored data, try to get from URL params or use default
-        const urlParams = new URLSearchParams(window.location.search);
-        const emailParam = urlParams.get('email');
-        const nameParam = urlParams.get('name');
-        
-        if (emailParam && nameParam) {
-          setUser({
-            name: decodeURIComponent(nameParam),
-            email: decodeURIComponent(emailParam)
-          });
-        } else {
-          // Fallback to default
-          setUser({
-            name: "New User",
-            email: "user@example.com"
-          });
+    // Check if user has already paid
+    if (profile) {
+      checkHasPaid().then(hasPaid => {
+        if (hasPaid) {
+          router.push('/thanks');
         }
-      } catch (error) {
-        console.error('Error getting user data:', error);
-        setUser({
-          name: "New User",
-          email: "user@example.com"
-        });
-      }
-    };
-    
-    getUserData();
-  }, []);
+      });
+    }
+  }, [loading, isAuthenticated, profile, router, checkHasPaid]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !profile) {
+    return null; // Will redirect to login
+  }
+
+  const user = {
+    name: profile.full_name || profile.name,
+    email: profile.email
+  };
 
   const handlePaymentSuccess = () => {
     // Redirect to thanks page after successful payment
@@ -94,7 +90,12 @@ export default function PayPage() {
                 <div className="text-xs text-muted-foreground">{user.email}</div>
               </div>
             </div>
-            <button className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-sm font-medium text-destructive">Logout</button>
+            <button 
+              onClick={signOut}
+              className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-sm font-medium text-destructive"
+            >
+              Logout
+            </button>
           </div>
         )}
       </div>
@@ -146,6 +147,9 @@ export default function PayPage() {
               </label>
             </div>
           </div>
+          {/* Debug Info */}
+          <DebugStripe />
+          
           {/* Stripe Payment Form */}
           <StripePaymentForm 
             user={user}

@@ -127,8 +127,16 @@ export default function HeroSection() {
       {/* Subheadline */}
       <div className="text-lg text-muted-foreground mb-8">Stop building from scratch. Start cloning success.</div>
       {/* CTA */}
-      <div className="w-full flex justify-center mb-10">
+      <div className="w-full flex flex-col items-center gap-4 mb-10">
         <JoinCloneAccessBtn onClick={() => window.location.href = "/signup"} />
+        <div className="text-center">
+          <button
+            onClick={() => window.location.href = "/login"}
+            className="text-gray-600 hover:text-purple-600 underline text-sm font-medium transition-colors"
+          >
+            Already a member? Sign in →
+          </button>
+        </div>
       </div>
       {/* Hero image */}
       <div className="w-full flex justify-center mb-6">

@@ -3,13 +3,15 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { CTAButton } from '@/components/ui/cta-button';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase-client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,12 +19,70 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Login logic here
-      console.log('Login attempt:', email);
-      // Placeholder for now
+      // Sign in with Supabase
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        console.error('Auth error details:', authError);
+        
+        // Provide better error messages
+        if (authError.message.includes('Email not confirmed')) {
+          setError('Please check your email and click the confirmation link first.');
+        } else if (authError.message.includes('Invalid login credentials')) {
+          setError('Invalid email or password. Please check your credentials.');
+        } else {
+          setError(authError.message);
+        }
+        return;
+      }
+
+      console.log('Login successful for:', email);
+
+      // Get user profile
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (profileError) {
+        console.error('Profile fetch error:', profileError);
+        setError('Failed to load user profile');
+        return;
+      }
+
+      // Store user data for the app
+      const userData = {
+        id: authData.user.id,
+        email: profile.email,
+        full_name: profile.full_name,
+        name: profile.full_name
+      };
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+
+      // Check payment status
+      const { data: payment } = await supabase
+        .from('payments')
+        .select('status')
+        .eq('email', email)
+        .eq('status', 'succeeded')
+        .single();
+
+      // Redirect based on payment status
+      if (payment) {
+        // User has paid, go to thanks page
+        router.push('/thanks');
+      } else {
+        // User hasn't paid, go to payment page
+        router.push(`/pay?email=${encodeURIComponent(email)}&name=${encodeURIComponent(profile.full_name)}`);
+      }
+
     } catch (err) {
-      setError('Login failed. Please try again.');
       console.error('Login error:', err);
+      setError('Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -41,7 +101,7 @@ export default function LoginPage() {
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-            <p className="text-gray-300">Sign in to continue your journey</p>
+            <p className="text-gray-300">Sign in to continue to your masterclass</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -81,13 +141,13 @@ export default function LoginPage() {
               </div>
             )}
 
-            <CTAButton
+            <button
               type="submit"
               disabled={isLoading}
-              className="w-full"
+              className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
             >
               {isLoading ? 'Signing In...' : 'Sign In'}
-            </CTAButton>
+            </button>
           </form>
 
           <div className="mt-6 text-center">

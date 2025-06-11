@@ -3,49 +3,68 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function ThanksPage() {
+  const { profile, loading, isAuthenticated } = useAuth();
+  const [paymentVerified, setPaymentVerified] = useState(false);
   const [user, setUser] = useState<{
     name: string;
     email: string;
   } | null>(null);
 
   useEffect(() => {
-    // Get user data from localStorage
-    const storedUserData = localStorage.getItem('currentUser');
-    
-    if (storedUserData) {
-      const userData = JSON.parse(storedUserData);
+    // Set user from auth profile
+    if (profile) {
       setUser({
-        name: userData.full_name || userData.name || 'New Member',
-        email: userData.email || 'user@example.com'
+        name: profile.full_name || profile.name || 'New Member',
+        email: profile.email
       });
+
+      // Verify payment status from database
+      fetch('/api/check-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: profile.email })
+      })
+      .then(res => res.json())
+      .then(data => {
+        setPaymentVerified(data.hasPaid);
+        if (!data.hasPaid) {
+          // Redirect to pay page if no payment found
+          setTimeout(() => {
+            window.location.href = '/pay';
+          }, 3000);
+        }
+      })
+      .catch(err => console.error('Payment verification error:', err));
     } else {
-      setUser({
-        name: 'New Member',
-        email: 'user@example.com'
-      });
-    }
-    
-    // Check if this is a successful payment from Stripe
-    const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = urlParams.get('session_id');
-    
-    if (sessionId) {
-      // Payment was successful via Stripe
-      console.log('Payment successful with session:', sessionId);
-      localStorage.setItem('paymentCompleted', 'true');
-    } else {
-      // No session ID, check if payment was completed before
+      // Fallback for users without auth
+      const storedUserData = localStorage.getItem('currentUser');
       const paymentCompleted = localStorage.getItem('paymentCompleted');
-      if (!paymentCompleted) {
-        console.log('No payment completed, redirecting to pay page');
-        setTimeout(() => {
-          window.location.href = '/pay';
-        }, 3000); // Give 3 seconds to show the page before redirect
+      
+      if (storedUserData) {
+        const userData = JSON.parse(storedUserData);
+        setUser({
+          name: userData.full_name || userData.name || 'New Member',
+          email: userData.email || 'user@example.com'
+        });
+      }
+
+      // Check if payment was completed
+      if (paymentCompleted === 'true') {
+        setPaymentVerified(true);
       }
     }
-  }, []);
+  }, [profile]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">

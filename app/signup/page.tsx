@@ -67,24 +67,43 @@ export default function SignupPage() {
       const result = await response.json();
 
       if (result.success) {
-        setMessage("Account created! Redirecting to payment...");
+        setMessage("Account created! Signing you in...");
         
-        // Store user data for the pay page
-        const userData = {
-          full_name: fullName,
-          email: email,
-          name: fullName
-        };
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        
-        // Redirect to pay page with user data
-        setTimeout(() => {
-          const params = new URLSearchParams({
+        // Auto-sign in the user after successful signup
+        try {
+          const { supabase } = await import('@/lib/supabase-client');
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+          if (signInError) {
+            console.error('Auto sign-in failed:', signInError);
+            setMessage("Account created! Please login manually.");
+            setTimeout(() => router.push('/login'), 2000);
+            return;
+          }
+
+          // Store user data for the app
+          const userData = {
+            full_name: fullName,
             email: email,
             name: fullName
-          });
-          router.push(`/pay?${params.toString()}`);
-        }, 1000);
+          };
+          localStorage.setItem('currentUser', JSON.stringify(userData));
+          
+          setMessage("Welcome! Redirecting to payment...");
+          
+          // Redirect to pay page
+          setTimeout(() => {
+            router.push('/pay');
+          }, 1000);
+          
+        } catch (autoSignInError) {
+          console.error('Auto sign-in error:', autoSignInError);
+          setMessage("Account created! Please login manually.");
+          setTimeout(() => router.push('/login'), 2000);
+        }
       } else {
         setMessage(result.error || "Failed to create account. Please try again.");
       }
