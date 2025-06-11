@@ -13,7 +13,6 @@ export default function ThanksPage() {
   useEffect(() => {
     // Get user data from localStorage
     const storedUserData = localStorage.getItem('currentUser');
-    const paymentCompleted = localStorage.getItem('paymentCompleted');
     
     if (storedUserData) {
       const userData = JSON.parse(storedUserData);
@@ -28,12 +27,23 @@ export default function ThanksPage() {
       });
     }
     
-    // Check if payment was completed, if not redirect to pay page
-    if (!paymentCompleted) {
-      console.log('No payment completed, redirecting to pay page');
-      setTimeout(() => {
-        window.location.href = '/pay';
-      }, 2000); // Give 2 seconds to show the page before redirect
+    // Check if this is a successful payment from Stripe
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    
+    if (sessionId) {
+      // Payment was successful via Stripe
+      console.log('Payment successful with session:', sessionId);
+      localStorage.setItem('paymentCompleted', 'true');
+    } else {
+      // No session ID, check if payment was completed before
+      const paymentCompleted = localStorage.getItem('paymentCompleted');
+      if (!paymentCompleted) {
+        console.log('No payment completed, redirecting to pay page');
+        setTimeout(() => {
+          window.location.href = '/pay';
+        }, 3000); // Give 3 seconds to show the page before redirect
+      }
     }
   }, []);
 

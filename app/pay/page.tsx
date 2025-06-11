@@ -25,6 +25,7 @@ export default function PayPage() {
   const [country, setCountry] = useState(countries[0]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({ name: "Loading...", email: "loading..." });
+  const [selectedPlan, setSelectedPlan] = useState("one-time");
 
   // Get user data on component mount
   useEffect(() => {
@@ -75,26 +76,27 @@ export default function PayPage() {
     setLoading(true);
     
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Record payment (for demo purposes)
-      await fetch('/api/check-payment', {
+      // Create Stripe checkout session
+      const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: user.email,
-          sessionId: 'demo_session_' + Date.now(),
-          amount: 49700, // $497.00 in cents
-          status: 'succeeded'
+          name: user.name,
+          priceId: selectedPlan === "one-time" 
+            ? 'price_1RYuvpRAsDNTTxJIrqvcgqYS' // One-time payment
+            : 'price_1RYuvpRAsDNTTxJIp7DU5OqY' // Monthly payment
         })
       });
-      
-      // Store payment success for thanks page
-      localStorage.setItem('paymentCompleted', 'true');
-      
-      // Redirect to success page
-      window.location.href = '/thanks';
+
+      const { url, error } = await response.json();
+
+      if (error) {
+        throw new Error(error);
+      }
+
+      // Redirect to Stripe checkout
+      window.location.href = url;
       
     } catch (error) {
       console.error('Payment error:', error);
@@ -144,6 +146,44 @@ export default function PayPage() {
             You&apos;re one step away from joining the Vibe Coding Masterclass. 
             Choose your preferred payment option below.
           </p>
+          
+          {/* Payment Plan Selection */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-foreground mb-3">Choose Your Plan:</label>
+            <div className="space-y-3">
+              <label className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                <input
+                  type="radio"
+                  name="plan"
+                  value="one-time"
+                  checked={selectedPlan === "one-time"}
+                  onChange={(e) => setSelectedPlan(e.target.value)}
+                  className="w-4 h-4 text-purple-600"
+                />
+                <div className="flex-1">
+                  <div className="font-semibold">One-Time Payment</div>
+                  <div className="text-sm text-gray-600">Pay once, lifetime access</div>
+                </div>
+                <div className="font-bold text-lg">$497</div>
+              </label>
+              
+              <label className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                <input
+                  type="radio"
+                  name="plan"
+                  value="monthly"
+                  checked={selectedPlan === "monthly"}
+                  onChange={(e) => setSelectedPlan(e.target.value)}
+                  className="w-4 h-4 text-purple-600"
+                />
+                <div className="flex-1">
+                  <div className="font-semibold">3-Month Plan</div>
+                  <div className="text-sm text-gray-600">$197/month for 3 months</div>
+                </div>
+                <div className="font-bold text-lg">$197<span className="text-sm font-normal">/mo</span></div>
+              </label>
+            </div>
+          </div>
           {/* Card number */}
           <label className="flex flex-col gap-1 font-medium text-sm text-foreground">
             <span className="flex items-center gap-2">
@@ -224,7 +264,7 @@ export default function PayPage() {
             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 rounded-xl text-lg shadow transition mt-2"
             disabled={loading}
           >
-            {loading ? "Processing..." : "Start Vibe Coding"}
+            {loading ? "Processing..." : `Pay ${selectedPlan === "one-time" ? "$497" : "$197/mo"} - Start Vibe Coding`}
           </button>
           {/* Note */}
           <div className="rounded-lg bg-gray-50 px-4 py-2 text-xs text-center text-muted-foreground mt-2">
