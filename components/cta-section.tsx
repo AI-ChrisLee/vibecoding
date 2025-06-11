@@ -69,35 +69,18 @@ export default function CTASection() {
         <span className="mx-2 font-bold">{time.minutes} mins</span>, and
         <span className="mx-2 font-bold">{time.seconds} seconds</span>.
       </motion.div>
-      {/* Email form */}
-      <motion.form
-        {...fadeInUp}
-        transition={{ ...fadeInUp.transition, delay: 0.28 }}
-        onSubmit={handleSubmit}
-        className="flex flex-col md:flex-row items-center gap-3 w-full max-w-xl mb-3"
-      >
-        <input
-          type="email"
-          required
-          placeholder="Enter your email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          className="flex-1 px-4 py-3 rounded-xl border border-gray-300 text-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white shadow w-full"
-        />
-        <button
-          type="submit"
-          className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 py-3 rounded-xl text-lg shadow transition w-full md:w-auto"
-        >
-          Enroll Now
-        </button>
-      </motion.form>
-      {/* Helper text */}
+      {/* CTA button only, no email */}
       <motion.div
         {...fadeInUp}
-        transition={{ ...fadeInUp.transition, delay: 0.32 }}
-        className="text-base text-gray-400 mt-1"
+        transition={{ ...fadeInUp.transition, delay: 0.28 }}
+        className="w-full flex justify-center mb-6"
       >
-        <span role="img" aria-label="point">☝️</span> Enroll by entering your email above.
+        <a
+          href="/signup"
+          className="text-base font-bold shadow-lg px-8 py-4 font-sans transition-transform duration-200 hover:scale-105 cursor-pointer bg-primary text-white rounded-full w-full max-w-xl text-center"
+        >
+          Join The Clone Accelerator →
+        </a>
       </motion.div>
       {submitted && (
         <div className="mt-2 text-green-500 font-semibold">Thank you! We'll be in touch soon.</div>

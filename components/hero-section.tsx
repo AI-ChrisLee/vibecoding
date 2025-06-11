@@ -110,63 +110,38 @@ function getTimeLeft(targetDate: Date) {
 export default function HeroSection() {
   return (
     <motion.section
+      id="hero-section"
       initial={{ opacity: 0, y: 32 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
       className="w-full max-w-2xl mx-auto px-4 py-12 flex flex-col items-center text-center font-sans relative"
     >
-      {/* Grouped hero content for tighter hierarchy */}
-      <div className="flex flex-col items-center gap-1 mb-4">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.4 }}
-          className="text-primary font-bold text-sm tracking-wide uppercase mb-0"
+      {/* Header: Logo + Title (smaller, like date line) */}
+      <div className="flex items-center gap-2 mb-3 mt-2 self-center">
+        <img src="/assets/Profile.png" alt="Logo" width={28} height={28} className="rounded-full border border-gray-200" />
+        <span className="font-semibold text-base text-muted-foreground">Vibecoding Masterclass by chris</span>
+      </div>
+      {/* Date */}
+      <div className="text-base text-muted-foreground mb-6">July 11 - August 1, 2025</div>
+      {/* Main headline */}
+      <h1 className="text-4xl md:text-5xl font-black leading-tight text-center font-sans mb-4">Vibe Coding Proven Winners Into Your Winning Apps in 21 Days</h1>
+      {/* Subheadline */}
+      <div className="text-lg text-muted-foreground mb-8">Stop building from scratch. Start cloning success.</div>
+      {/* CTA */}
+      <div className="w-full flex justify-center mb-10">
+        <a
+          href="/signup"
+          className="text-base font-bold shadow-lg px-8 py-4 font-sans transition-transform duration-200 hover:scale-105 cursor-pointer bg-primary text-white rounded-full"
         >
-          The Vibe Coding Masterclass
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.18, duration: 0.4 }}
-          className="text-xs text-muted-foreground mb-1"
-        >
-          July 11 - August 1, 2025
-        </motion.div>
-        <motion.h1
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.22, duration: 0.6, ease: "easeOut" }}
-          className="text-3xl md:text-4xl font-black leading-tight mb-1"
-        >
-          Vibe Coding Proven Winners Into Your Winning Apps in 21 Days
-        </motion.h1>
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.28, duration: 0.4 }}
-          className="text-base text-muted-foreground mb-2"
-        >
-          Stop building from scratch. Start cloning success.
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.32, duration: 0.4 }}
-          className="w-full flex justify-center mb-2"
-        >
-          <a
-            href="/signup"
-            className="text-base font-bold shadow-lg px-8 py-2 font-sans transition-transform duration-200 hover:scale-105 cursor-pointer bg-primary text-white rounded-full"
-          >
-            Join The Clone Accelerator →
-          </a>
-        </motion.div>
+          Join The Clone Accelerator →
+        </a>
       </div>
       {/* Hero image */}
-      <HeroImage src="/assets/Hero.png" alt="Demo of the clone sprint" />
+      <div className="w-full flex justify-center mb-6">
+        <HeroImage src="/assets/Hero.png" alt="Demo of the clone sprint" />
+      </div>
       {/* Tool badges at the bottom */}
-      <div className="flex gap-2 justify-center mt-6">
+      <div className="flex gap-3 justify-center mt-2 mb-2">
         {['Cursor AI', 'Supabase', 'Vercel', 'git'].map((tool) => (
           <span
             key={tool}
