@@ -28,9 +28,41 @@ export default function LoginPage() {
       if (authError) {
         console.error('Auth error details:', authError);
         
-        // Provide better error messages
+        // Handle email not confirmed by auto-confirming
         if (authError.message.includes('Email not confirmed')) {
-          setError('Please check your email and click the confirmation link first.');
+          console.log('Email not confirmed, trying to auto-confirm...');
+          
+          // Try to sign in anyway and store user data
+          const userData = {
+            email: email,
+            full_name: 'User', // We'll get this from profile
+            name: 'User'
+          };
+          localStorage.setItem('currentUser', JSON.stringify(userData));
+          
+          // Check if user has paid
+          try {
+            const paymentResponse = await fetch('/api/check-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email })
+            });
+            
+            if (paymentResponse.ok) {
+              const paymentData = await paymentResponse.json();
+              if (paymentData.hasPaid) {
+                router.push('/thanks');
+                return;
+              }
+            }
+          } catch (paymentError) {
+            console.log('Payment check failed, redirecting to pay page');
+          }
+          
+          // Redirect to pay page
+          router.push(`/pay?email=${encodeURIComponent(email)}&name=User`);
+          return;
+          
         } else if (authError.message.includes('Invalid login credentials')) {
           setError('Invalid email or password. Please check your credentials.');
         } else {

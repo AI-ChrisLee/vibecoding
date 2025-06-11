@@ -35,6 +35,13 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    // Also manually confirm the user to ensure they can login immediately
+    if (authData.user && !authError) {
+      await supabase.auth.admin.updateUserById(authData.user.id, {
+        email_confirm: true
+      });
+    }
+
     if (authError) {
       console.error('Auth error:', authError);
       return NextResponse.json({

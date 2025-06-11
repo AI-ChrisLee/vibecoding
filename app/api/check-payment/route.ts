@@ -36,8 +36,37 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, sessionId, amount, status } = await request.json();
+    const body = await request.json();
+    const { email, sessionId, amount, status } = body;
 
+    // If this is just a payment check (no sessionId), check payment status
+    if (email && !sessionId) {
+      try {
+        const { data: payment, error } = await supabase
+          .from('payments')
+          .select('status')
+          .eq('email', email)
+          .eq('status', 'succeeded')
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          console.error('Payment check error:', error);
+          // Return false but don't fail completely
+          return NextResponse.json({ hasPaid: false });
+        }
+
+        return NextResponse.json({ 
+          hasPaid: !!payment,
+          status: payment?.status || 'no_payment'
+        });
+      } catch (checkError) {
+        console.error('Payment check failed:', checkError);
+        // Fallback: assume no payment
+        return NextResponse.json({ hasPaid: false });
+      }
+    }
+
+    // Record new payment
     if (!email || !sessionId) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },

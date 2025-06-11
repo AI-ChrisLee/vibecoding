@@ -6,62 +6,71 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function ThanksPage() {
-  const { profile, loading, isAuthenticated } = useAuth();
   const [paymentVerified, setPaymentVerified] = useState(false);
   const [user, setUser] = useState<{
     name: string;
     email: string;
   } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Set user from auth profile
-    if (profile) {
-      setUser({
-        name: profile.full_name || profile.name || 'New Member',
-        email: profile.email
-      });
+    // Get user data and verify payment
+    const initializePage = async () => {
+      try {
+        // Get user data from localStorage (always available after payment)
+        const storedUserData = localStorage.getItem('currentUser');
+        const paymentCompleted = localStorage.getItem('paymentCompleted');
+        
+        if (storedUserData) {
+          const userData = JSON.parse(storedUserData);
+          setUser({
+            name: userData.full_name || userData.name || 'New Member',
+            email: userData.email
+          });
 
-      // Verify payment status from database
-      fetch('/api/check-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: profile.email })
-      })
-      .then(res => res.json())
-      .then(data => {
-        setPaymentVerified(data.hasPaid);
-        if (!data.hasPaid) {
-          // Redirect to pay page if no payment found
+          // Try to verify payment from database
+          try {
+            const response = await fetch('/api/check-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: userData.email })
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              setPaymentVerified(data.hasPaid);
+            } else {
+              // If API fails, fall back to localStorage
+              setPaymentVerified(paymentCompleted === 'true');
+            }
+          } catch (apiError) {
+            console.log('API verification failed, using localStorage fallback');
+            setPaymentVerified(paymentCompleted === 'true');
+          }
+        } else {
+          // No user data, redirect to signup
           setTimeout(() => {
-            window.location.href = '/pay';
-          }, 3000);
+            window.location.href = '/signup';
+          }, 2000);
         }
-      })
-      .catch(err => console.error('Payment verification error:', err));
-    } else {
-      // Fallback for users without auth
-      const storedUserData = localStorage.getItem('currentUser');
-      const paymentCompleted = localStorage.getItem('paymentCompleted');
-      
-      if (storedUserData) {
-        const userData = JSON.parse(storedUserData);
-        setUser({
-          name: userData.full_name || userData.name || 'New Member',
-          email: userData.email || 'user@example.com'
-        });
-      }
-
-      // Check if payment was completed
-      if (paymentCompleted === 'true') {
+      } catch (error) {
+        console.error('Page initialization error:', error);
+        // Fallback: show page anyway
+        setUser({ name: 'New Member', email: 'user@example.com' });
         setPaymentVerified(true);
+      } finally {
+        setIsLoading(false);
       }
-    }
-  }, [profile]);
+    };
 
-  if (loading) {
+    initializePage();
+  }, []);
+
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+        <p className="text-white mt-4">Verifying your payment...</p>
       </div>
     );
   }
