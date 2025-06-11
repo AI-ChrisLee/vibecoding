@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import SignupHeader from "@/components/ui/signup-header";
+import StripePaymentForm from "@/components/stripe-payment-form";
 
 
 const bonuses = [
@@ -13,17 +14,11 @@ const bonuses = [
   { icon: "🛠", text: "Done-For-You Tech Stack - Cursor AI, Supabase, Vercel setup" },
 ];
 
-const countries = ["United States", "Canada", "United Kingdom", "Australia", "Germany", "France", "Korea", "Japan"];
+
 
 export default function PayPage() {
   const [profileOpen, setProfileOpen] = useState(false);
-  const [card, setCard] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvc, setCvc] = useState("");
-  const [postal, setPostal] = useState("");
-  const [name, setName] = useState("");
-  const [country, setCountry] = useState(countries[0]);
-  const [loading, setLoading] = useState(false);
+
   const [user, setUser] = useState({ name: "Loading...", email: "loading..." });
   const [selectedPlan, setSelectedPlan] = useState("one-time");
 
@@ -71,39 +66,9 @@ export default function PayPage() {
     getUserData();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    
-    try {
-      // Create Stripe checkout session
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: user.email,
-          name: user.name,
-          priceId: selectedPlan === "one-time" 
-            ? 'price_1RYuvpRAsDNTTxJIrqvcgqYS' // One-time payment
-            : 'price_1RYuvpRAsDNTTxJIp7DU5OqY' // Monthly payment
-        })
-      });
-
-      const { url, error } = await response.json();
-
-      if (error) {
-        throw new Error(error);
-      }
-
-      // Redirect to Stripe checkout
-      window.location.href = url;
-      
-    } catch (error) {
-      console.error('Payment error:', error);
-      alert('Payment failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  const handlePaymentSuccess = () => {
+    // Redirect to thanks page after successful payment
+    window.location.href = '/thanks';
   };
 
   return (
@@ -136,11 +101,8 @@ export default function PayPage() {
       <SignupHeader />
       {/* Responsive 2-column layout */}
       <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        {/* Left: Card form */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200 flex flex-col gap-6"
-        >
+        {/* Left: Payment form */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200 flex flex-col gap-6">
           <h2 className="text-2xl font-bold mb-6">Complete Your Enrollment</h2>
           <p className="text-gray-600 mb-8">
             You&apos;re one step away from joining the Vibe Coding Masterclass. 
@@ -184,93 +146,18 @@ export default function PayPage() {
               </label>
             </div>
           </div>
-          {/* Card number */}
-          <label className="flex flex-col gap-1 font-medium text-sm text-foreground">
-            <span className="flex items-center gap-2">
-              <span className="text-lg">💳</span>
-              Card number
-            </span>
-            <input
-              type="text"
-              required
-              value={card}
-              onChange={e => setCard(e.target.value)}
-              className="border border-gray-200 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-              placeholder="1234 5678 9012 3456"
-              maxLength={19}
-            />
-          </label>
-          {/* Expiry, CVC, Postal (inline) */}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              required
-              value={expiry}
-              onChange={e => setExpiry(e.target.value)}
-              className="border border-gray-200 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-background w-1/3"
-              placeholder="MM/YY"
-              maxLength={5}
-            />
-            <input
-              type="text"
-              required
-              value={cvc}
-              onChange={e => setCvc(e.target.value)}
-              className="border border-gray-200 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-background w-1/3"
-              placeholder="CVC"
-              maxLength={4}
-            />
-            <input
-              type="text"
-              required
-              value={postal}
-              onChange={e => setPostal(e.target.value)}
-              className="border border-gray-200 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-background w-1/3"
-              placeholder="Postal code"
-            />
-          </div>
-          {/* Name */}
-          <label className="flex flex-col gap-1 font-medium text-sm text-foreground">
-            <span className="flex items-center gap-2">
-              <span role="img" aria-label="pencil">✍️</span> Name on card
-            </span>
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={e => setName(e.target.value)}
-              className="border border-gray-200 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-              placeholder="Your name"
-            />
-          </label>
-          {/* Country */}
-          <label className="flex flex-col gap-1 font-medium text-sm text-foreground">
-            <span className="flex items-center gap-2">
-              <span role="img" aria-label="flag">🌎</span> Country
-            </span>
-            <select
-              value={country}
-              onChange={e => setCountry(e.target.value)}
-              className="border border-gray-200 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-            >
-              {countries.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </label>
-          {/* CTA */}
-          <button
-            type="submit"
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 rounded-xl text-lg shadow transition mt-2"
-            disabled={loading}
-          >
-            {loading ? "Processing..." : `Pay ${selectedPlan === "one-time" ? "$497" : "$197/mo"} - Start Vibe Coding`}
-          </button>
+          {/* Stripe Payment Form */}
+          <StripePaymentForm 
+            user={user}
+            selectedPlan={selectedPlan}
+            onSuccess={handlePaymentSuccess}
+          />
+          
           {/* Note */}
           <div className="rounded-lg bg-gray-50 px-4 py-2 text-xs text-center text-muted-foreground mt-2">
-            You might see a $5 pre-authorization charge on your statement. Don't worry! This will be immediately refunded.
+            Secure payment processing by Stripe. Your information is protected.
           </div>
-        </form>
+        </div>
         {/* Right: Explanation/bonus section */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200 flex flex-col gap-4">
           <h3 className="text-xl font-bold text-foreground mb-2">What you get:</h3>
