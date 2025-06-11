@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import SignupHeader from "@/components/ui/signup-header";
 
+
 const bonuses = [
   { icon: "🎯", text: "4 Live Peer Learning Sessions" },
   { icon: "📚", text: "Weekly Course Drops - Fresh blueprints delivered each week" },
@@ -26,11 +27,35 @@ export default function PayPage() {
   // Dummy user
   const user = { name: "Chris Lee", email: "chris@vibecoding.com" };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => setLoading(false), 1200);
-    // TODO: Connect to Stripe
+    
+    try {
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Record payment (for demo purposes)
+      await fetch('/api/check-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          sessionId: 'demo_session_' + Date.now(),
+          amount: 49700, // $497.00 in cents
+          status: 'succeeded'
+        })
+      });
+      
+      // Redirect to success page
+      window.location.href = '/thanks';
+      
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Payment failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,7 +72,13 @@ export default function PayPage() {
         {profileOpen && (
           <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 flex flex-col gap-2 z-30">
             <div className="flex items-center gap-3 mb-2">
-              <Image src="/assets/Profile.png" alt="Profile" width={36} height={36} className="rounded-full border border-gray-200" />
+              <Image 
+                src="/assets/profile-100-compress.png" 
+                alt="Profile"
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
               <div>
                 <div className="font-bold text-base text-foreground">{user.name}</div>
                 <div className="text-xs text-muted-foreground">{user.email}</div>
@@ -65,11 +96,17 @@ export default function PayPage() {
           onSubmit={handleSubmit}
           className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200 flex flex-col gap-6"
         >
-          <h2 className="text-2xl font-black text-foreground mb-2 text-left">Last step. Confirm your account.</h2>
+          <h2 className="text-2xl font-bold mb-6">Complete Your Enrollment</h2>
+          <p className="text-gray-600 mb-8">
+            You&apos;re one step away from joining the Vibe Coding Masterclass. 
+            Choose your preferred payment option below.
+          </p>
           {/* Card number */}
           <label className="flex flex-col gap-1 font-medium text-sm text-foreground">
             <span className="flex items-center gap-2">
-              <span className="inline-block w-8"><img src="/visa.svg" alt="Visa" className="h-5" /></span>
+              <span className="inline-block w-8">
+                <Image src="/visa.svg" alt="Visa" width={20} height={20} className="h-5" />
+              </span>
               Card number
             </span>
             <input

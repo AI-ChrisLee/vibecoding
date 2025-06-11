@@ -22,13 +22,14 @@ function getTimeLeft(targetDate: Date) {
 }
 
 export default function SignupPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [agree, setAgree] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [time, setTime] = useState<{days: string, hours: string, minutes: string, seconds: string} | null>(null);
   const router = useRouter();
@@ -42,12 +43,12 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!agree) {
+    if (!acceptedTerms) {
       setMessage("You must agree to the terms & conditions and privacy policies.");
       return;
     }
     
-    setLoading(true);
+    setIsLoading(true);
     setMessage(null);
     
     try {
@@ -59,18 +60,18 @@ export default function SignupPage() {
         body: JSON.stringify({
           email,
           password,
-          full_name: name,
+          full_name: fullName,
         }),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        setMessage("Account created! Check your email to verify.");
-        // Redirect to thanks page after 2 seconds
+        setMessage("Account created! Redirecting to payment...");
+        // Redirect to pay page after 1 second
         setTimeout(() => {
-          window.location.href = "/thanks";
-        }, 2000);
+          router.push("/pay");
+        }, 1000);
       } else {
         setMessage(result.error || "Failed to create account. Please try again.");
       }
@@ -78,7 +79,7 @@ export default function SignupPage() {
       console.error('Signup error:', error);
       setMessage("Something went wrong. Please try again.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -115,8 +116,8 @@ export default function SignupPage() {
           <input
             type="text"
             required
-            value={name}
-            onChange={e => setName(e.target.value)}
+            value={fullName}
+            onChange={e => setFullName(e.target.value)}
             className="border border-gray-200 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-background"
             placeholder="Your name"
           />
@@ -162,8 +163,8 @@ export default function SignupPage() {
         <label className="flex items-center gap-2 text-xs text-muted-foreground select-none flex-wrap">
           <input
             type="checkbox"
-            checked={agree}
-            onChange={e => setAgree(e.target.checked)}
+            checked={acceptedTerms}
+            onChange={e => setAcceptedTerms(e.target.checked)}
             className="accent-primary w-4 h-4 rounded border border-gray-300"
             required
           />

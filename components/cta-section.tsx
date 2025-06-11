@@ -20,7 +20,6 @@ function getTimeLeft(targetDate: Date) {
 }
 
 export default function CTASection() {
-  const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [time, setTime] = useState(getTimeLeft(new Date("2025-07-11T17:00:00Z")));
 
@@ -29,11 +28,7 @@ export default function CTASection() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-    // TODO: handle actual email submission
-  };
+
 
   return (
     <motion.section

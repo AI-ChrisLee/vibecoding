@@ -1,110 +1,114 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import SignupHeader from "@/components/ui/signup-header";
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { CTAButton } from '@/components/ui/cta-button';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [stayLoggedIn, setStayLoggedIn] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage(null);
-    // TODO: Add your login logic here
-    setTimeout(() => {
-      setLoading(false);
-      setMessage("Logged in! Redirecting...");
-    }, 1200);
+    setIsLoading(true);
+    setError('');
+
+    try {
+      // Login logic here
+      console.log('Login attempt:', email);
+      // Placeholder for now
+    } catch (err) {
+      setError('Login failed. Please try again.');
+      console.error('Login error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
-      {/* Header */}
-      <SignupHeader />
-      {/* Headline */}
-      <h1 className="text-3xl md:text-4xl font-black text-foreground mb-2 text-center">Login</h1>
-      {/* Subheadline */}
-      <p className="text-muted-foreground mb-8 text-center max-w-xl">
-        Hey, welcome back! <span role="img" aria-label="wave">👋</span>
-      </p>
-      {/* Card */}
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white rounded-2xl shadow p-8 flex flex-col gap-4 border border-gray-200"
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative z-10 w-full max-w-md"
       >
-        {/* Email */}
-        <label className="flex flex-col gap-1 font-medium text-sm text-foreground">
-          <span className="flex items-center gap-2">
-            <span role="img" aria-label="mail">✉️</span> Email address
-          </span>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="border border-gray-200 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-            placeholder="Email address"
-          />
-        </label>
-        {/* Password */}
-        <label className="flex flex-col gap-1 font-medium text-sm text-foreground">
-          <span className="flex items-center gap-2">
-            <span role="img" aria-label="lock">🔒</span> Password
-            <button
-              type="button"
-              tabIndex={-1}
-              className="ml-2 text-gray-400 hover:text-primary focus:outline-none"
-              onClick={() => setShowPassword(v => !v)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
+            <p className="text-gray-300">Sign in to continue your journey</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block text-white text-sm font-medium mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter your email"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-white text-sm font-medium mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="Enter your password"
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3">
+                <p className="text-red-200 text-sm">{error}</p>
+              </div>
+            )}
+
+            <CTAButton
+              type="submit"
+              disabled={isLoading}
+              className="w-full"
             >
-              <span role="img" aria-label="eye">{showPassword ? "🙈" : "👁️"}</span>
-            </button>
-          </span>
-          <input
-            type={showPassword ? "text" : "password"}
-            required
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="border border-gray-200 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary bg-background"
-            placeholder="Password"
-          />
-        </label>
-        {/* Stay logged in & Forgot password */}
-        <div className="flex items-center justify-between mt-2 mb-1">
-          <label className="flex items-center gap-2 text-xs text-muted-foreground select-none">
-            <input
-              type="checkbox"
-              checked={stayLoggedIn}
-              onChange={e => setStayLoggedIn(e.target.checked)}
-              className="accent-primary w-4 h-4 rounded border border-gray-300"
-            />
-            Stay logged in
-          </label>
-          <a href="#" className="text-xs text-muted-foreground hover:text-primary underline underline-offset-2">Forgot password?</a>
+              {isLoading ? 'Signing In...' : 'Sign In'}
+            </CTAButton>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-gray-300">
+              Don&apos;t have an account?{' '}
+              <Link href="/signup" className="text-purple-400 hover:text-purple-300 font-medium">
+                Sign up
+              </Link>
+            </p>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-white/20 text-center">
+            <Link 
+              href="/"
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              ← Back to Home
+            </Link>
+          </div>
         </div>
-        {/* Submit */}
-        <button
-          type="submit"
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 rounded-xl text-lg shadow transition mt-2"
-          disabled={loading}
-        >
-          {loading ? "Logging in..." : "Login"}
-        </button>
-        {message && <div className="text-center mt-2 text-primary font-semibold">{message}</div>}
-      </form>
-      {/* Register link */}
-      <div className="mt-6 text-center text-muted-foreground text-sm">
-        Don't have an account yet?{' '}
-        <a href="/signup" className="underline underline-offset-2 hover:text-primary font-medium">Register</a>
-      </div>
-    </main>
+      </motion.div>
+    </div>
   );
 }

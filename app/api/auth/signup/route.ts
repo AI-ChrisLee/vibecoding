@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase-client';
-import type { SignupRequest, ApiResponse, Profile } from '@/lib/types/database';
+import type { SignupRequest, ApiResponse } from '@/lib/types/database';
 
 export async function POST(request: NextRequest) {
   try {
@@ -48,9 +48,10 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         user: authData.user,
-        message: 'User created! Please check email for confirmation.'
+        message: 'User created! Redirecting to payment...',
+        redirect: '/pay'
       }
-    } as ApiResponse<{ user: any; message: string }>, { status: 201 });
+    } as ApiResponse<{ user: unknown; message: string; redirect: string }>, { status: 201 });
 
   } catch (error) {
     console.error('Signup error:', error);

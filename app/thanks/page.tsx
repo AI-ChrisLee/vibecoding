@@ -1,60 +1,102 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function ThanksPage() {
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const [user, setUser] = useState<{
+    name: string;
+    email: string;
+  } | null>(null);
 
   useEffect(() => {
-    const checkStatus = async () => {
-      const { data } = await supabase.auth.getUser();
-      const user = data.user;
-      // if (!user) {
-      //   router.replace("/signup");
-      //   return;
-      // }
-      // Check payment status in leads
-      const { data: lead } = await supabase
-        .from("leads")
-        .select("status")
-        .eq("email", user?.email)
-        .single();
-
-      // if (!lead?.status || lead.status !== "paid") {
-      //   router.replace("/pay");
-      // }
-      setLoading(false);
+    // Get user data from localStorage or API
+    const userData = {
+      name: 'New Member',
+      email: 'user@example.com'
     };
-    checkStatus();
-  }, [router]);
-
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    setUser(userData);
+    
+    // Check payment status - if not paid, redirect to pay page
+    const checkPayment = async () => {
+      try {
+        const response = await fetch(`/api/check-payment?email=${encodeURIComponent(userData.email)}`);
+        const result = await response.json();
+        
+        if (!result.hasPaid) {
+          // Redirect to pay page if not paid
+          window.location.href = '/pay';
+          return;
+        }
+      } catch (error) {
+        console.error('Payment check failed:', error);
+        // On error, allow access to thanks page
+      }
+    };
+    
+    checkPayment();
+  }, []);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
-      <div className="max-w-lg w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-200 flex flex-col items-center gap-6">
-        <h1 className="text-2xl md:text-3xl font-black text-foreground text-center mb-2">Welcome to Vibe Coding! <span role='img' aria-label='party'>🎉</span></h1>
-        <div className="text-lg text-muted-foreground text-center mb-4">Your account has been created successfully.</div>
-        <div className="w-full text-left">
-          <div className="font-bold text-base mb-2">Next Steps:</div>
-          <ol className="list-decimal ml-6 space-y-3 text-base">
-            <li>
-              <span className="font-semibold">Check your email <span role='img' aria-label='email'>📧</span></span><br />
-              We've sent a confirmation link to your inbox. Click it.
-            </li>
-            <li>
-              <span className="font-semibold">Watch the quick start videos below <span role='img' aria-label='video'>📹</span></span><br />
-              Get ready for the masterclass with these essential guides.
-            </li>
-          </ol>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative z-10 w-full max-w-2xl text-center"
+      >
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-12 border border-white/20 shadow-2xl">
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Welcome to Vibe Coding! 🎉
+          </h1>
+          
+          <p className="text-xl text-gray-300 mb-8">
+            Your account has been created successfully.
+          </p>
+
+          <div className="bg-white/10 rounded-xl p-6 mb-8">
+            <h2 className="text-xl font-semibold text-white mb-4">Next Steps:</h2>
+            
+            <div className="space-y-4 text-left">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">📧</span>
+                <div>
+                  <h3 className="font-semibold text-white">Check your email</h3>
+                  <p className="text-gray-300">
+                    We&apos;ve sent a confirmation link to your inbox. Click it.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">📺</span>
+                <div>
+                  <h3 className="font-semibold text-white">Watch the quick start videos below 📹</h3>
+                  <p className="text-gray-300">
+                    Get ready for the masterclass with these essential guides.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <Link 
+              href="/"
+              className="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors"
+            >
+              Get Started
+            </Link>
+          </div>
+
+          <p className="text-gray-400 mt-8">
+            Questions? Hit us up at me@aichrislee.com
+          </p>
         </div>
-        <div className="text-sm text-muted-foreground text-center mt-2">
-          Questions? Hit us up at <a href="mailto:me@aichrislee.com" className="underline underline-offset-2 hover:text-primary font-medium">me@aichrislee.com</a>
-        </div>
-      </div>
-    </main>
+      </motion.div>
+    </div>
   );
 }
