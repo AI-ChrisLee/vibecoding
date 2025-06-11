@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import SignupHeader from "@/components/ui/signup-header";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -27,12 +28,7 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
       {/* Header */}
-      <div className="flex flex-col items-center mb-6">
-        <div className="flex items-center gap-3">
-          <Image src="/assets/Profile.png" alt="Logo" width={36} height={36} className="rounded-full border border-gray-200" />
-          <span className="font-bold text-lg text-foreground">Vibecoding Masterclass by chris</span>
-        </div>
-      </div>
+      <SignupHeader />
       {/* Headline */}
       <h1 className="text-3xl md:text-4xl font-black text-foreground mb-2 text-center">Login</h1>
       {/* Subheadline */}

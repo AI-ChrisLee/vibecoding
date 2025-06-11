@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { fadeInUp } from "@/components/clone-section";
+import JoinCloneAccessBtn from "@/components/ui/join-clone-access-btn";
 
 function getTimeLeft(targetDate: Date) {
   const target = targetDate.getTime();
@@ -70,18 +71,9 @@ export default function CTASection() {
         <span className="mx-2 font-bold">{time.seconds} seconds</span>.
       </motion.div>
       {/* CTA button only, no email */}
-      <motion.div
-        {...fadeInUp}
-        transition={{ ...fadeInUp.transition, delay: 0.28 }}
-        className="w-full flex justify-center mb-6"
-      >
-        <a
-          href="/signup"
-          className="text-base font-bold shadow-lg px-8 py-4 font-sans transition-transform duration-200 hover:scale-105 cursor-pointer bg-primary text-white rounded-full w-full max-w-xl text-center"
-        >
-          Join The Clone Accelerator →
-        </a>
-      </motion.div>
+      <div className="w-full flex justify-center">
+        <JoinCloneAccessBtn onClick={() => window.location.href = "/signup"} />
+      </div>
       {submitted && (
         <div className="mt-2 text-green-500 font-semibold">Thank you! We'll be in touch soon.</div>
       )}

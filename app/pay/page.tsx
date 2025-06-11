@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import SignupHeader from "@/components/ui/signup-header";
 
 const bonuses = [
   { icon: "🎯", text: "4 Live Peer Learning Sessions" },
@@ -33,7 +34,7 @@ export default function PayPage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12 relative">
+    <main className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12 pt-12 md:pt-12 relative">
       {/* Profile button top right */}
       <div className="absolute top-6 right-6 z-20">
         <button
@@ -56,6 +57,7 @@ export default function PayPage() {
           </div>
         )}
       </div>
+      <SignupHeader />
       {/* Responsive 2-column layout */}
       <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         {/* Left: Card form */}
@@ -63,8 +65,7 @@ export default function PayPage() {
           onSubmit={handleSubmit}
           className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200 flex flex-col gap-6"
         >
-          <h2 className="text-2xl font-black text-foreground mb-2">Last step. Confirm your account.</h2>
-          <p className="text-muted-foreground mb-4 text-base">Your trial is 100% free of charge. By verifying your details we ensure your account stays online and you don't lose access after your trial.</p>
+          <h2 className="text-2xl font-black text-foreground mb-2 text-left">Last step. Confirm your account.</h2>
           {/* Card number */}
           <label className="flex flex-col gap-1 font-medium text-sm text-foreground">
             <span className="flex items-center gap-2">
@@ -145,7 +146,7 @@ export default function PayPage() {
             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 rounded-xl text-lg shadow transition mt-2"
             disabled={loading}
           >
-            {loading ? "Processing..." : "Start 14-day trial"}
+            {loading ? "Processing..." : "Start Vibe Coding"}
           </button>
           {/* Note */}
           <div className="rounded-lg bg-gray-50 px-4 py-2 text-xs text-center text-muted-foreground mt-2">

@@ -4,6 +4,8 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import SignupHeader from "@/components/ui/signup-header";
+import JoinCloneAccessBtn from "@/components/ui/join-clone-access-btn";
 
 // ToolStack: pill badges for tech stack
 function ToolStack({ tools }: { tools: string[] }) {
@@ -117,24 +119,16 @@ export default function HeroSection() {
       className="w-full max-w-2xl mx-auto px-4 py-12 flex flex-col items-center text-center font-sans relative"
     >
       {/* Header: Logo + Title (smaller, like date line) */}
-      <div className="flex items-center gap-2 mb-3 mt-2 self-center">
-        <img src="/assets/Profile.png" alt="Logo" width={28} height={28} className="rounded-full border border-gray-200" />
-        <span className="font-semibold text-base text-muted-foreground">Vibecoding Masterclass by chris</span>
-      </div>
+      <SignupHeader />
       {/* Date */}
       <div className="text-base text-muted-foreground mb-6">July 11 - August 1, 2025</div>
       {/* Main headline */}
-      <h1 className="text-4xl md:text-5xl font-black leading-tight text-center font-sans mb-4">Vibe Coding Proven Winners Into Your Winning Apps in 21 Days</h1>
+      <h1 className="text-4xl md:text-5xl font-black leading-tight text-center font-sans mb-4">Proven Winners Into Your Winning Apps in 21 Days</h1>
       {/* Subheadline */}
       <div className="text-lg text-muted-foreground mb-8">Stop building from scratch. Start cloning success.</div>
       {/* CTA */}
       <div className="w-full flex justify-center mb-10">
-        <a
-          href="/signup"
-          className="text-base font-bold shadow-lg px-8 py-4 font-sans transition-transform duration-200 hover:scale-105 cursor-pointer bg-primary text-white rounded-full"
-        >
-          Join The Clone Accelerator →
-        </a>
+        <JoinCloneAccessBtn onClick={() => window.location.href = "/signup"} />
       </div>
       {/* Hero image */}
       <div className="w-full flex justify-center mb-6">

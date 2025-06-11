@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import SignupHeader from "@/components/ui/signup-header";
+import JoinCloneAccessBtn from "@/components/ui/join-clone-access-btn";
 
 function getTimeLeft(targetDate: Date) {
   const target = targetDate.getTime();
@@ -56,12 +58,7 @@ export default function SignupPage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
       {/* Header */}
-      <div className="flex flex-col items-center mb-6">
-        <div className="flex items-center gap-3">
-          <Image src="/assets/Profile.png" alt="Logo" width={36} height={36} className="rounded-full border border-gray-200" />
-          <span className="font-black text-2xl text-foreground">Vibecoding Masterclass by chris</span>
-        </div>
-      </div>
+      <SignupHeader />
       {/* Progress Bar */}
       <div className="flex items-center justify-center gap-6 mb-8 text-base font-medium text-muted-foreground select-none">
         <span className="text-primary font-bold">1. Register</span>
@@ -151,13 +148,7 @@ export default function SignupPage() {
           </span>
         </label>
         {/* Submit */}
-        <button
-          type="submit"
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 rounded-xl text-lg shadow transition mt-2"
-          disabled={loading}
-        >
-          {loading ? "Creating account..." : "Next step"}
-        </button>
+        <JoinCloneAccessBtn type="submit">Next step</JoinCloneAccessBtn>
         {message && <div className="text-center mt-2 text-primary font-semibold">{message}</div>}
       </form>
       {/* Login link */}

@@ -34,13 +34,27 @@ export default function ThanksPage() {
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold mb-4">You're In!</h1>
-      <p className="text-lg text-center max-w-xl">
-        Welcome to the Vibe Coding Masterclass.<br />
-        3 weeks. 3 apps. Zero excuses.<br />
-        <b>Check your email for next steps and join the community!</b>
-      </p>
+    <main className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
+      <div className="max-w-lg w-full bg-white rounded-2xl shadow-xl p-8 border border-gray-200 flex flex-col items-center gap-6">
+        <h1 className="text-2xl md:text-3xl font-black text-foreground text-center mb-2">Welcome to Vibe Coding! <span role='img' aria-label='party'>🎉</span></h1>
+        <div className="text-lg text-muted-foreground text-center mb-4">Your account has been created successfully.</div>
+        <div className="w-full text-left">
+          <div className="font-bold text-base mb-2">Next Steps:</div>
+          <ol className="list-decimal ml-6 space-y-3 text-base">
+            <li>
+              <span className="font-semibold">Check your email <span role='img' aria-label='email'>📧</span></span><br />
+              We've sent a confirmation link to your inbox. Click it.
+            </li>
+            <li>
+              <span className="font-semibold">Watch the quick start videos below <span role='img' aria-label='video'>📹</span></span><br />
+              Get ready for the masterclass with these essential guides.
+            </li>
+          </ol>
+        </div>
+        <div className="text-sm text-muted-foreground text-center mt-2">
+          Questions? Hit us up at <a href="mailto:me@aichrislee.com" className="underline underline-offset-2 hover:text-primary font-medium">me@aichrislee.com</a>
+        </div>
+      </div>
     </main>
   );
 }
