@@ -21,8 +21,9 @@ const skipIf = [
 export default function CompareSection() {
   return (
     <motion.section
+      whileInView={{ opacity: 1, y: 0 }}
       initial={fadeInUp.initial}
-      animate={fadeInUp.animate}
+      viewport={{ once: true, amount: 0.3 }}
       transition={fadeInUp.transition}
       className="w-full max-w-2xl mx-auto px-4 py-12 flex flex-col items-start text-left"
     >

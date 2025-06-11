@@ -14,8 +14,9 @@ export default function CloneSection() {
   const router = useRouter();
   return (
     <motion.section
-      initial={fadeInUp.initial}
-      animate={fadeInUp.animate}
+      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 32 }}
+      viewport={{ once: true, amount: 0.3 }}
       transition={fadeInUp.transition}
       className="w-full max-w-2xl mx-auto px-4 py-12 flex flex-col items-start text-left"
     >

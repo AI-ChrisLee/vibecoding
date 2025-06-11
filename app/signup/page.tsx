@@ -46,13 +46,40 @@ export default function SignupPage() {
       setMessage("You must agree to the terms & conditions and privacy policies.");
       return;
     }
+    
     setLoading(true);
     setMessage(null);
-    // TODO: Add your signup logic here
-    setTimeout(() => {
+    
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          full_name: name,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setMessage("Account created! Check your email to verify.");
+        // Redirect to thanks page after 2 seconds
+        setTimeout(() => {
+          window.location.href = "/thanks";
+        }, 2000);
+      } else {
+        setMessage(result.error || "Failed to create account. Please try again.");
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      setMessage("Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
-      setMessage("Account created! Check your email to verify.");
-    }, 1200);
+    }
   };
 
   return (

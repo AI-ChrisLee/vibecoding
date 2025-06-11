@@ -47,8 +47,9 @@ const bonuses = [
 export default function SyllabusSection() {
   return (
     <motion.section
+      whileInView={{ opacity: 1, y: 0 }}
       initial={fadeInUp.initial}
-      animate={fadeInUp.animate}
+      viewport={{ once: true, amount: 0.3 }}
       transition={fadeInUp.transition}
       className="w-full max-w-2xl mx-auto px-4 py-12 flex flex-col items-start text-left"
     >
@@ -66,9 +67,8 @@ export default function SyllabusSection() {
             key={week.title}
             {...fadeInUp}
             transition={{ ...fadeInUp.transition, delay: 0.22 + i * 0.08 }}
-            className="bg-white border border-gray-200 rounded-2xl shadow-sm p-0 flex flex-col min-h-[340px] overflow-hidden"
+            className="bg-white border border-gray-200 rounded-2xl shadow-sm p-0 flex flex-col overflow-hidden"
           >
-            <img src={week.image} alt={week.title} className="w-full h-36 object-cover" />
             <div className="p-5 flex flex-col gap-2 flex-1">
               <div className="font-black text-2xl mb-2">{week.title}</div>
               <ul className="list-disc ml-5 space-y-1 text-sm text-black">
