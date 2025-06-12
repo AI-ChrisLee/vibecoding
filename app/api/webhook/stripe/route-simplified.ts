@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       userAgent: request.headers.get('user-agent')
     });
 
-    // For testing, let's also accept requests without signature verification
+    // Verify webhook signature
     let event: Stripe.Event;
     
     if (signature && endpointSecret) {
@@ -43,14 +43,24 @@ export async function POST(request: NextRequest) {
 
     console.log('📨 Webhook event type:', event.type);
 
+    // Log the event for debugging
+    const supabase = createServiceSupabase();
+    await supabase
+      .from('stripe_events_new')
+      .insert({
+        stripe_event_id: event.id,
+        event_type: event.type,
+        processed: false
+      })
+      .select()
+      .single();
+
     // Handle payment intent succeeded
     if (event.type === 'payment_intent.succeeded') {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
       
       console.log('💰 Payment succeeded:', paymentIntent.id);
       console.log('📧 User email:', paymentIntent.metadata.user_email);
-
-      const supabase = createServiceSupabase();
 
       // Extract user info from metadata
       const userEmail = paymentIntent.metadata.user_email;
@@ -59,50 +69,67 @@ export async function POST(request: NextRequest) {
 
       if (!userEmail) {
         console.error('❌ No user email in payment metadata');
+        await supabase
+          .from('stripe_events_new')
+          .update({ 
+            processed: true, 
+            error_message: 'No user email in metadata' 
+          })
+          .eq('stripe_event_id', event.id);
         return NextResponse.json({ error: 'No user email' }, { status: 400 });
       }
 
-      // Look up user_id from auth.users table using email
-      console.log('🔍 Looking up user_id for email:', userEmail);
-      const { data: authUser, error: userLookupError } = await supabase.auth.admin.listUsers();
-      
-      if (userLookupError) {
-        console.error('❌ Error looking up user:', userLookupError);
+      // Find user in simplified users table
+      console.log('🔍 Looking up user:', userEmail);
+      const { data: user, error: userError } = await supabase
+        .from('users_new')
+        .select('*')
+        .eq('email', userEmail)
+        .single();
+
+      if (userError || !user) {
+        console.error('❌ User not found:', userError);
+        await supabase
+          .from('stripe_events_new')
+          .update({ 
+            processed: true, 
+            error_message: `User not found: ${userError?.message}` 
+          })
+          .eq('stripe_event_id', event.id);
         return NextResponse.json({ 
-          error: 'User lookup failed', 
-          details: userLookupError.message 
-        }, { status: 500 });
+          error: 'User not found', 
+          details: userError?.message 
+        }, { status: 404 });
       }
 
-      const user = authUser.users.find(u => u.email === userEmail);
-      if (!user) {
-        console.error('❌ User not found for email:', userEmail);
-        return NextResponse.json({ error: 'User not found' }, { status: 404 });
-      }
+      console.log('✅ Found user:', user.id);
 
-      console.log('✅ Found user_id:', user.id);
-
-      // Save payment to database
+      // Save payment to simplified payments table
       console.log('💾 Saving payment to database...');
       const { data: payment, error: paymentError } = await supabase
-        .from('payments')
+        .from('payments_new')
         .insert({
           user_id: user.id,
-          email: userEmail,
           stripe_payment_intent_id: paymentIntent.id,
           stripe_session_id: paymentIntent.id,
           amount_cents: paymentIntent.amount,
           currency: paymentIntent.currency,
           status: 'succeeded',
           plan_type: planType || 'one-time',
-          product_type: planType || 'one-time',
           payment_date: new Date().toISOString()
         })
         .select()
         .single();
 
       if (paymentError) {
-        console.error('❌ Error saving payment to database:', paymentError);
+        console.error('❌ Error saving payment:', paymentError);
+        await supabase
+          .from('stripe_events_new')
+          .update({ 
+            processed: true, 
+            error_message: `Payment save failed: ${paymentError.message}` 
+          })
+          .eq('stripe_event_id', event.id);
         return NextResponse.json({ 
           error: 'Database error', 
           details: paymentError.message,
@@ -110,51 +137,32 @@ export async function POST(request: NextRequest) {
         }, { status: 500 });
       }
 
-      console.log('✅ Payment saved to database:', payment.id);
+      console.log('✅ Payment saved:', payment.id);
 
-      // Update user_dashboard with stripe_customer_id and payment info
-      console.log('📝 Updating user_dashboard...');
-      const { error: dashboardError } = await supabase
-        .from('user_dashboard')
+      // Update user status to 'paid' and advance onboarding
+      console.log('📝 Updating user status...');
+      const { error: userUpdateError } = await supabase
+        .from('users_new')
         .update({
-          stripe_customer_id: paymentIntent.customer as string || paymentIntent.id,
-          onboarding_step: 2 // Move to next step after payment
-        })
-        .eq('email', userEmail);
-
-      if (dashboardError) {
-        console.warn('⚠️ Error updating user_dashboard:', dashboardError);
-      } else {
-        console.log('✅ User dashboard updated for:', userEmail);
-      }
-
-      // Update user's enrollment status
-      const { error: enrollmentError } = await supabase
-        .from('enrollments')
-        .upsert({
-          user_email: userEmail,
-          course_name: 'Vibe Coding Masterclass',
-          enrollment_date: new Date().toISOString(),
-          status: 'active',
-          payment_id: payment.id
-        });
-
-      if (enrollmentError) {
-        console.warn('⚠️ Error creating enrollment (non-critical):', enrollmentError);
-      }
-
-      // Update lead status
-      const { error: leadError } = await supabase
-        .from('leads')
-        .update({ 
           status: 'paid',
-          payment_date: new Date().toISOString()
+          onboarding_step: 2,
+          stripe_customer_id: paymentIntent.customer as string || paymentIntent.id,
+          updated_at: new Date().toISOString()
         })
-        .eq('email', userEmail);
+        .eq('id', user.id);
 
-      if (leadError) {
-        console.warn('⚠️ Error updating lead status (non-critical):', leadError);
+      if (userUpdateError) {
+        console.warn('⚠️ Error updating user status:', userUpdateError);
+        // Don't fail the webhook for this - payment is already saved
+      } else {
+        console.log('✅ User status updated to paid');
       }
+
+      // Mark event as processed
+      await supabase
+        .from('stripe_events_new')
+        .update({ processed: true })
+        .eq('stripe_event_id', event.id);
 
       console.log('🎉 Payment processing complete for:', userEmail);
     }
@@ -163,17 +171,33 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('💥 Webhook error:', error);
+    
+    // Try to log the error
+    try {
+      const supabase = createServiceSupabase();
+      await supabase
+        .from('stripe_events_new')
+        .update({ 
+          processed: true, 
+          error_message: error.message 
+        })
+        .eq('stripe_event_id', 'unknown');
+    } catch (logError) {
+      console.error('Failed to log error:', logError);
+    }
+
     return NextResponse.json(
-      { error: 'Webhook handler failed' },
+      { error: 'Webhook handler failed', details: error.message },
       { status: 500 }
     );
   }
 }
 
-// Also handle GET requests for testing
+// Handle GET requests for testing
 export async function GET() {
   return NextResponse.json({ 
-    message: 'Stripe webhook endpoint is working!',
-    timestamp: new Date().toISOString()
+    message: 'Simplified Stripe webhook endpoint is working!',
+    timestamp: new Date().toISOString(),
+    structure: 'simplified'
   });
 } 

@@ -46,7 +46,7 @@ export default function PayPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -82,7 +82,7 @@ export default function PayPage() {
         {profileOpen && (
           <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 flex flex-col gap-2 z-30">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                 <span className="text-xl">👤</span>
               </div>
               <div>
@@ -121,7 +121,7 @@ export default function PayPage() {
                   value="one-time"
                   checked={selectedPlan === "one-time"}
                   onChange={(e) => setSelectedPlan(e.target.value)}
-                  className="w-4 h-4 text-purple-600"
+                  className="w-4 h-4 text-blue-600"
                 />
                 <div className="flex-1">
                   <div className="font-semibold">One-Time Payment</div>
@@ -137,7 +137,7 @@ export default function PayPage() {
                   value="monthly"
                   checked={selectedPlan === "monthly"}
                   onChange={(e) => setSelectedPlan(e.target.value)}
-                  className="w-4 h-4 text-purple-600"
+                  className="w-4 h-4 text-blue-600"
                 />
                 <div className="flex-1">
                   <div className="font-semibold">3-Month Plan</div>

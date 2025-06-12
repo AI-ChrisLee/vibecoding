@@ -121,7 +121,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
       
       <motion.div
@@ -176,7 +176,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
             >
               {isLoading ? 'Signing In...' : 'Sign In'}
             </button>
@@ -185,7 +185,7 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-gray-300">
               Don&apos;t have an account?{' '}
-              <Link href="/signup" className="text-purple-400 hover:text-purple-300 font-medium">
+              <Link href="/signup" className="text-blue-300 hover:text-blue-200 font-medium">
                 Sign up
               </Link>
             </p>

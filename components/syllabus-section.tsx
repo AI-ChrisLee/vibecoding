@@ -1,103 +1,127 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { fadeInUp } from "@/components/clone-section";
 
 const weeks = [
   {
     title: "Week 1: Vibe Code The $8M Landing Page",
     image: "/assets/week1.png",
-    bullets: [
-      "Clone Perspective's venture-backed hero section",
-      "Hook forms to Supabase waitlist",
-      "Deploy on your domain with <2s load time",
-      "Ships Friday: Live landing page capturing emails",
-    ],
+    description: "You'll clone Perspective's venture-backed hero section, hook forms to Supabase waitlist, and deploy on your domain with <2s load time.",
+    highlight: "Ships Friday: Live landing page capturing emails.",
   },
   {
-    title: "Week 2: Vibe Code The Authentication Dashboard Engine",
+    title: "Week 2: Vibe Code The Authentication Dashboard Engine", 
     image: "/assets/week2.png",
-    bullets: [
-      "Build Supabase auth + protected dashboard",
-      "Create user onboarding flow",
-      "Set up payment-ready infrastructure",
-      "Ships Friday: Working login system",
-    ],
+    description: "Build Supabase auth + protected dashboard, create user onboarding flow, and set up payment-ready infrastructure.",
+    highlight: "Ships Friday: Working login system.",
   },
   {
     title: "Week 3: Vibe Code The AI Money Machine",
-    image: "/assets/week3.png",
-    bullets: [
-      "Clone Jenny.ai's core AI feature",
-      "Integrate OpenAI API + Stripe payments",
-      "Launch with credit-based pricing",
-      "Ships Friday: Revenue-generating AI app",
-    ],
+    image: "/assets/week3.png", 
+    description: "Clone Jenny.ai's core AI feature, integrate OpenAI API + Stripe payments, and launch with credit-based pricing.",
+    highlight: "Ships Friday: Revenue-generating AI app.",
   },
 ];
 
 const bonuses = [
-  { icon: "🎯", text: "4 Live Peer Learning Sessions" },
-  { icon: "📚", text: "Weekly Course Drops - Fresh blueprints delivered each week" },
-  { icon: "📊", text: "The $10M Clone Database - 47 pre-researched products ready to clone" },
-  { icon: "⚡", text: "Ship-or-Refund Accountability - No hiding, no excuses, just results" },
-  { icon: "🛠", text: "Done-For-You Tech Stack - Cursor AI, Supabase, Vercel setup" },
+  "4 Live Peer Learning Sessions",
+  "Weekly Course Drops - Fresh blueprints delivered each week", 
+  "The $10M Clone Database - 47 pre-researched products ready to clone",
+  "Ship-or-Refund Accountability - No hiding, no excuses, just results",
+  "Done-For-You Tech Stack - Cursor AI, Supabase, Vercel setup",
 ];
 
 export default function SyllabusSection() {
   return (
-    <motion.section
-      whileInView={{ opacity: 1, y: 0 }}
-      initial={fadeInUp.initial}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={fadeInUp.transition}
-      className="w-full max-w-2xl mx-auto px-4 py-12 flex flex-col items-start text-left"
-    >
-      {/* Step badge */}
-      <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.1 }} className="flex items-center gap-2 mb-4">
-        <span className="badge-outline-gray font-semibold">
-          <span className="font-mono text-xs font-bold mr-2">03</span>
-          The 21-Day Syllabus
-        </span>
-      </motion.div>
-      {/* Week Cards */}
-      <div className="flex flex-col gap-4 w-full mb-8">
-        {weeks.map((week, i) => (
-          <motion.div
-            key={week.title}
-            {...fadeInUp}
-            transition={{ ...fadeInUp.transition, delay: 0.22 + i * 0.08 }}
-            className="bg-white border border-gray-200 rounded-2xl shadow-sm p-0 flex flex-col overflow-hidden"
-          >
-            <div className="p-5 flex flex-col gap-2 flex-1">
-              <div className="font-black text-2xl mb-2">{week.title}</div>
-              <ul className="list-disc ml-5 space-y-1 text-sm text-black">
-                {week.bullets.map((b, j) => (
-                  <li key={j} className={b.startsWith("Ships Friday") ? "font-bold" : ""}>
-                    {b}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-      {/* Each week statement */}
-      <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.45 }} className="font-bold text-foreground mb-8">
-        Each week = One complete, profitable vibe coded clone.
-      </motion.div>
-      {/* Bonuses */}
-      <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: 0.5 }} className="w-full">
-        <div className="font-bold text-lg mb-2">Bonus :</div>
-        <ul className="space-y-2">
-          {bonuses.map((bonus, i) => (
-            <li key={i} className="flex items-start gap-2 text-base text-black">
-              <span className="text-xl">{bonus.icon}</span>
-              <span>{bonus.text}</span>
-            </li>
+    <section className="w-full py-16 px-4 bg-white" aria-labelledby="syllabus-heading">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="text-left mb-10 md:mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+        >
+          <div className="inline-flex items-center px-4 py-2 rounded-md border-2 border-blue-200 text-blue-700 bg-blue-50 text-sm font-semibold mb-4 md:mb-6">
+            <span className="font-mono text-xs font-bold mr-2">03</span>
+            The 21-Day Syllabus
+          </div>
+          <h2 id="syllabus-heading" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 mb-4 md:mb-6 leading-tight">
+            One complete, profitable clone.<br />
+            <span className="text-blue-600">Every single week.</span>
+          </h2>
+        </motion.div>
+
+        {/* Week content - Single column for all screen sizes */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          viewport={{ once: true }}
+          className="space-y-12 md:space-y-16 mb-12 md:mb-16"
+        >
+          {weeks.map((week, i) => (
+            <motion.div 
+              key={week.title} 
+              className="space-y-4 md:space-y-6"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              viewport={{ once: true }}
+            >
+              {/* Single column layout for all screen sizes */}
+              <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
+                {week.title}
+              </h3>
+              <div className="w-full max-w-2xl rounded-lg overflow-hidden bg-gray-100 shadow-lg ring-1 ring-gray-200 hover:shadow-xl transition-shadow duration-300">
+                <Image
+                  src={week.image}
+                  alt={`${week.title} - Course preview showing the app interface and features`}
+                  width={600}
+                  height={400}
+                  className="w-full h-auto object-cover"
+                  quality={90}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                />
+              </div>
+              <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-3xl">
+                {week.description}
+              </p>
+              <p className="text-base md:text-lg font-bold text-blue-600 bg-blue-50 inline-block px-3 py-1 rounded-md">
+                {week.highlight}
+              </p>
+            </motion.div>
           ))}
-        </ul>
-      </motion.div>
-    </motion.section>
+        </motion.div>
+
+        {/* Simplified bonuses */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          viewport={{ once: true }}
+          className="space-y-6 max-w-3xl bg-gray-50 rounded-lg p-6 md:p-8 border border-gray-200"
+        >
+          <h3 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <span className="text-2xl">🎁</span>
+            Plus These Bonuses:
+          </h3>
+          
+          <ul className="space-y-4 text-base md:text-lg text-gray-600 leading-relaxed" role="list">
+            {bonuses.map((bonus, i) => (
+              <li key={i} className="flex items-start gap-3" role="listitem">
+                <span className="text-blue-600 font-bold text-lg">•</span>
+                <span className="font-medium">{bonus}</span>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+      </div>
+    </section>
   );
 } 

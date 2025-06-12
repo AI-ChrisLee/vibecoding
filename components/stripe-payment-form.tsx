@@ -125,7 +125,7 @@ function CheckoutForm({ user, selectedPlan, onSuccess }: PaymentFormProps) {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Card Information
         </label>
-        <div className="p-4 border-2 rounded-lg bg-white focus-within:border-purple-500 transition-colors">
+        <div className="p-4 border-2 rounded-lg bg-white focus-within:border-blue-500 transition-colors">
           <CardElement
             options={{
               style: {
@@ -161,7 +161,7 @@ function CheckoutForm({ user, selectedPlan, onSuccess }: PaymentFormProps) {
       <button
         type="submit"
         disabled={!stripe || !elements || loading}
-        className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl text-lg shadow transition"
+        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl text-lg shadow transition"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
