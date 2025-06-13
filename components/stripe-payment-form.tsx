@@ -26,6 +26,8 @@ function CheckoutForm({ user, selectedPlan, onSuccess }: PaymentFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stripeLoaded, setStripeLoaded] = useState(false);
+  const [country, setCountry] = useState('US');
+  const [acceptedPolicy, setAcceptedPolicy] = useState(false);
 
   // Debug: Check if Stripe is loading
   React.useEffect(() => {
@@ -44,6 +46,11 @@ function CheckoutForm({ user, selectedPlan, onSuccess }: PaymentFormProps) {
       return;
     }
 
+    if (!acceptedPolicy) {
+      setError('Please accept the terms and conditions to continue.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -59,9 +66,15 @@ function CheckoutForm({ user, selectedPlan, onSuccess }: PaymentFormProps) {
           amount,
           email: user.email,
           name: user.name,
-          planType: selectedPlan
+          planType: selectedPlan,
+          currency: 'usd'
         })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create payment intent');
+      }
 
       const { clientSecret, error: apiError } = await response.json();
 
@@ -76,6 +89,9 @@ function CheckoutForm({ user, selectedPlan, onSuccess }: PaymentFormProps) {
           billing_details: {
             name: user.name,
             email: user.email,
+            address: {
+              country: country,
+            },
           },
         },
       });
@@ -99,6 +115,7 @@ function CheckoutForm({ user, selectedPlan, onSuccess }: PaymentFormProps) {
         onSuccess();
       }
     } catch (err: any) {
+      console.error('Payment error:', err);
       setError(err.message || 'Payment failed');
     } finally {
       setLoading(false);
@@ -143,13 +160,74 @@ function CheckoutForm({ user, selectedPlan, onSuccess }: PaymentFormProps) {
                   iconColor: '#ef4444',
                 },
               },
-              hidePostalCode: false,
+              hidePostalCode: true, // Hide postal code to avoid format conflicts
             }}
           />
         </div>
         <div className="text-xs text-gray-500 mt-1">
-          Test card: 4242 4242 4242 4242
+          Test card: 4242 4242 4242 4242 • Any future date • Any 3-digit CVC
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Country
+        </label>
+        <select
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          className="w-full p-3 border-2 rounded-lg bg-white focus:border-blue-500 transition-colors"
+          required
+        >
+          <option value="US">🇺🇸 United States</option>
+          <option value="CA">🇨🇦 Canada</option>
+          <option value="GB">🇬🇧 United Kingdom</option>
+          <option value="AU">🇦🇺 Australia</option>
+          <option value="DE">🇩🇪 Germany</option>
+          <option value="FR">🇫🇷 France</option>
+          <option value="IT">🇮🇹 Italy</option>
+          <option value="ES">🇪🇸 Spain</option>
+          <option value="NL">🇳🇱 Netherlands</option>
+          <option value="SE">🇸🇪 Sweden</option>
+          <option value="NO">🇳🇴 Norway</option>
+          <option value="DK">🇩🇰 Denmark</option>
+          <option value="FI">🇫🇮 Finland</option>
+          <option value="CH">🇨🇭 Switzerland</option>
+          <option value="AT">🇦🇹 Austria</option>
+          <option value="BE">🇧🇪 Belgium</option>
+          <option value="IE">🇮🇪 Ireland</option>
+          <option value="PT">🇵🇹 Portugal</option>
+          <option value="LU">🇱🇺 Luxembourg</option>
+          <option value="JP">🇯🇵 Japan</option>
+          <option value="SG">🇸🇬 Singapore</option>
+          <option value="HK">🇭🇰 Hong Kong</option>
+          <option value="NZ">🇳🇿 New Zealand</option>
+        </select>
+        <div className="text-xs text-gray-500 mt-1">
+          Select your billing country for tax calculation
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3">
+        <input
+          type="checkbox"
+          id="policy-checkbox"
+          checked={acceptedPolicy}
+          onChange={(e) => setAcceptedPolicy(e.target.checked)}
+          className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          required
+        />
+        <label htmlFor="policy-checkbox" className="text-sm text-gray-700">
+          I agree to the{' '}
+          <a href="/terms" target="_blank" className="text-blue-600 hover:underline">
+            Terms of Service
+          </a>{' '}
+          and{' '}
+          <a href="/privacy" target="_blank" className="text-blue-600 hover:underline">
+            Privacy Policy
+          </a>
+          . I understand this is a digital product with no refunds except as outlined in our guarantee.
+        </label>
       </div>
 
       {error && (
@@ -160,7 +238,7 @@ function CheckoutForm({ user, selectedPlan, onSuccess }: PaymentFormProps) {
 
       <button
         type="submit"
-        disabled={!stripe || !elements || loading}
+        disabled={!stripe || !elements || loading || !acceptedPolicy}
         className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl text-lg shadow transition"
       >
         {loading ? (

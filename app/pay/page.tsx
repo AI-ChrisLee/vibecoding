@@ -1,66 +1,61 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import SignupHeader from "@/components/ui/signup-header";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { 
+  Section, 
+  Container, 
+  Heading, 
+  Text, 
+  Button, 
+  StepBadge, 
+  List, 
+  Animated,
+  Card
+} from "@/components/ui/design-system";
 import StripePaymentForm from "@/components/stripe-payment-form";
 import DebugStripe from "@/components/debug-stripe";
-import { useAuth } from "@/hooks/useAuth";
-
 
 const bonuses = [
-  { icon: "🎯", text: "4 Live Peer Learning Sessions" },
-  { icon: "📚", text: "Weekly Course Drops - Fresh blueprints delivered each week" },
-  { icon: "📊", text: "The $10M Clone Database - 47 pre-researched products ready to clone" },
-  { icon: "⚡", text: "Ship-or-Refund Accountability - No hiding, no excuses, just results" },
-  { icon: "🛠", text: "Done-For-You Tech Stack - Cursor AI, Supabase, Vercel setup" },
+  "🎯 4 Live Peer Learning Sessions",
+  "📚 Weekly Course Drops - Fresh blueprints delivered each week",
+  "📊 The $10M Clone Database - 47 pre-researched products ready to clone",
+  "⚡ Ship-or-Refund Accountability - No hiding, no excuses, just results",
+  "🛠 Done-For-You Tech Stack - Cursor AI, Supabase, Vercel setup"
 ];
 
-
-
-export default function PayPage() {
-  const [profileOpen, setProfileOpen] = useState(false);
+function PayPageContent() {
   const [selectedPlan, setSelectedPlan] = useState("one-time");
+  const [customerInfo, setCustomerInfo] = useState<{name: string, email: string} | null>(null);
   const router = useRouter();
-  const { profile, loading, isAuthenticated, signOut, checkHasPaid } = useAuth();
+  const searchParams = useSearchParams();
 
-  // Redirect to login if not authenticated
+  // Get customer info from URL parameters
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      router.push('/login');
+    const email = searchParams.get('email');
+    const name = searchParams.get('name');
+    
+    if (!email || !name) {
+      // If no customer info, redirect to home
+      router.push('/');
       return;
     }
+    
+    setCustomerInfo({ name, email });
+  }, [searchParams, router]);
 
-    // Check if user has already paid
-    if (profile) {
-      checkHasPaid().then(hasPaid => {
-        if (hasPaid) {
-          router.push('/thanks');
-        }
-      });
-    }
-  }, [loading, isAuthenticated, profile, router, checkHasPaid]);
-
-  if (loading) {
+  if (!customerInfo) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
+      <Section background="white">
+        <Container>
+          <div className="text-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <Text variant="body" color="muted">Loading...</Text>
+          </div>
+        </Container>
+      </Section>
     );
   }
-
-  if (!isAuthenticated || !profile) {
-    return null; // Will redirect to login
-  }
-
-  const user = {
-    name: profile.full_name || profile.name,
-    email: profile.email
-  };
 
   const handlePaymentSuccess = () => {
     // Redirect to thanks page after successful payment
@@ -68,115 +63,189 @@ export default function PayPage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12 pt-12 md:pt-12 relative">
-      {/* Profile button top right */}
+    <main className="min-h-screen bg-white">
+      {/* Customer info display top right */}
       <div className="absolute top-6 right-6 z-20">
-        <button
-          onClick={() => setProfileOpen((v) => !v)}
-          className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 shadow hover:bg-gray-50 transition"
-        >
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-gray-200 shadow-lg">
           <span className="text-xl">👤</span>
-          <span className="font-semibold text-sm text-foreground">{user.name}</span>
-          <span className="text-xs text-gray-500">▼</span>
-        </button>
-        {profileOpen && (
-          <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4 flex flex-col gap-2 z-30">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-xl">👤</span>
-              </div>
-              <div>
-                <div className="font-bold text-base text-foreground">{user.name}</div>
-                <div className="text-xs text-muted-foreground">{user.email}</div>
-              </div>
-            </div>
-            <button 
-              onClick={signOut}
-              className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 text-sm font-medium text-destructive"
-            >
-              Logout
-            </button>
-          </div>
-        )}
-      </div>
-      <SignupHeader />
-      {/* Responsive 2-column layout */}
-      <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        {/* Left: Payment form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200 flex flex-col gap-6">
-          <h2 className="text-2xl font-bold mb-6">Complete Your Enrollment</h2>
-          <p className="text-gray-600 mb-8">
-            You&apos;re one step away from joining the Vibe Coding Masterclass. 
-            Choose your preferred payment option below.
-          </p>
-          
-          {/* Payment Plan Selection */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-foreground mb-3">Choose Your Plan:</label>
-            <div className="space-y-3">
-              <label className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name="plan"
-                  value="one-time"
-                  checked={selectedPlan === "one-time"}
-                  onChange={(e) => setSelectedPlan(e.target.value)}
-                  className="w-4 h-4 text-blue-600"
-                />
-                <div className="flex-1">
-                  <div className="font-semibold">One-Time Payment</div>
-                  <div className="text-sm text-gray-600">Pay once, lifetime access</div>
-                </div>
-                <div className="font-bold text-lg">$497</div>
-              </label>
-              
-              <label className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name="plan"
-                  value="monthly"
-                  checked={selectedPlan === "monthly"}
-                  onChange={(e) => setSelectedPlan(e.target.value)}
-                  className="w-4 h-4 text-blue-600"
-                />
-                <div className="flex-1">
-                  <div className="font-semibold">3-Month Plan</div>
-                  <div className="text-sm text-gray-600">$197/month for 3 months</div>
-                </div>
-                <div className="font-bold text-lg">$197<span className="text-sm font-normal">/mo</span></div>
-              </label>
-            </div>
-          </div>
-          {/* Debug Info */}
-          <DebugStripe />
-          
-          {/* Stripe Payment Form */}
-          <StripePaymentForm 
-            user={user}
-            selectedPlan={selectedPlan}
-            onSuccess={handlePaymentSuccess}
-          />
-          
-          {/* Note */}
-          <div className="rounded-lg bg-gray-50 px-4 py-2 text-xs text-center text-muted-foreground mt-2">
-            Secure payment processing by Stripe. Your information is protected.
+          <div>
+            <div className="font-semibold text-sm text-gray-900">{customerInfo.name}</div>
+            <div className="text-xs text-gray-500">{customerInfo.email}</div>
           </div>
         </div>
-        {/* Right: Explanation/bonus section */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200 flex flex-col gap-4">
-          <h3 className="text-xl font-bold text-foreground mb-2">What you get:</h3>
-          <ul className="flex flex-col gap-3 mb-2">
-            {bonuses.map((b, i) => (
-              <li key={i} className="flex items-center gap-3 text-base text-foreground">
-                <span className="text-2xl">{b.icon}</span>
-                <span>{b.text}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="text-sm text-muted-foreground mt-2">Next tier unlocks at <span className="font-bold">$999</span> when Founding sells out.</div>
-          <div className="text-sm text-muted-foreground">Payment plans available. Results guaranteed.</div>
-        </div>
       </div>
+
+      <Section background="white">
+        <Container>
+          <div className="max-w-6xl mx-auto">
+            {/* Header */}
+            <div className="text-center mb-12">
+              <Animated animation="fadeInUp">
+                <div className="flex justify-center mb-8">
+                  <StepBadge step="2/3" title="Complete Your Payment" variant="blue" />
+                </div>
+              </Animated>
+
+              <Animated animation="fadeInUp" delay={0.1}>
+                <Heading level="h1" color="default" className="mb-4">
+                  You're One Step Away, {customerInfo.name}!
+                </Heading>
+              </Animated>
+
+              <Animated animation="fadeInUp" delay={0.2}>
+                <Text variant="body" color="muted" className="max-w-2xl mx-auto">
+                  Complete your enrollment to join the Vibe Coding Accelerator and start building profitable clones.
+                </Text>
+              </Animated>
+            </div>
+
+            {/* Two Column Layout */}
+            <div className="grid lg:grid-cols-2 gap-12 items-start">
+              {/* Left: Payment Form */}
+              <Animated animation="fadeInUp" delay={0.3}>
+                <Card padding="lg">
+                  <Heading level="h2" color="default" className="mb-6">
+                    Complete Your Enrollment
+                  </Heading>
+                  
+                  <Text variant="body" color="muted" className="mb-8">
+                    Choose your preferred payment option below and secure your spot in the next cohort.
+                  </Text>
+                  
+                  {/* Payment Plan Selection */}
+                  <div className="mb-8">
+                    <Text variant="small" color="default" className="font-bold mb-4">
+                      Choose Your Plan:
+                    </Text>
+                    <div className="space-y-4">
+                      <label className="flex items-center gap-4 p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors border-blue-200 bg-blue-50">
+                        <input
+                          type="radio"
+                          name="plan"
+                          value="one-time"
+                          checked={selectedPlan === "one-time"}
+                          onChange={(e) => setSelectedPlan(e.target.value)}
+                          className="w-4 h-4 text-blue-600"
+                        />
+                        <div className="flex-1">
+                          <div className="font-bold text-gray-900">One-Time Payment</div>
+                          <div className="text-sm text-gray-600">Pay once, lifetime access</div>
+                          <div className="text-xs text-blue-600 font-medium mt-1">🔥 Most Popular</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-2xl text-gray-900">$497</div>
+                          <div className="text-xs text-gray-500">Best Value</div>
+                        </div>
+                      </label>
+                      
+                      <label className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                        <input
+                          type="radio"
+                          name="plan"
+                          value="monthly"
+                          checked={selectedPlan === "monthly"}
+                          onChange={(e) => setSelectedPlan(e.target.value)}
+                          className="w-4 h-4 text-blue-600"
+                        />
+                        <div className="flex-1">
+                          <div className="font-bold text-gray-900">3-Month Plan</div>
+                          <div className="text-sm text-gray-600">$197/month for 3 months</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-2xl text-gray-900">$197</div>
+                          <div className="text-xs text-gray-500">/month</div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Debug Info */}
+                  <DebugStripe />
+                  
+                  {/* Stripe Payment Form */}
+                  <StripePaymentForm 
+                    user={customerInfo}
+                    selectedPlan={selectedPlan}
+                    onSuccess={handlePaymentSuccess}
+                  />
+                  
+                  {/* Security Note */}
+                  <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <Text variant="caption" color="muted" className="text-center">
+                      🔒 Secure payment processing by Stripe. Your information is protected with bank-level security.
+                    </Text>
+                  </div>
+                </Card>
+              </Animated>
+
+              {/* Right: Benefits */}
+              <Animated animation="fadeInUp" delay={0.4}>
+                <div className="space-y-8">
+                  {/* What You Get */}
+                  <Card padding="lg">
+                    <Heading level="h2" color="default" className="mb-6">
+                      What You Get Today
+                    </Heading>
+                    <List items={bonuses} variant="bullet" color="blue" className="mb-6" />
+                    
+                    <div className="border-t pt-6 mt-6">
+                      <Text variant="small" color="muted" className="mb-2">
+                        Next tier unlocks at <span className="font-bold text-gray-900">$999</span> when Founding sells out.
+                      </Text>
+                      <Text variant="small" color="muted">
+                        Payment plans available. Results guaranteed.
+                      </Text>
+                    </div>
+                  </Card>
+
+                  {/* Guarantee */}
+                  <Card padding="md" className="bg-green-50 border-green-200">
+                    <div className="text-center">
+                      <div className="text-3xl mb-3">💰</div>
+                      <Heading level="h3" color="default" className="mb-3">
+                        Ship-or-Refund Guarantee
+                      </Heading>
+                      <Text variant="body" color="muted">
+                        Deploy your first profitable clone or get 100% of your money back. No questions asked.
+                      </Text>
+                    </div>
+                  </Card>
+
+                  {/* Urgency */}
+                  <Card padding="md" className="bg-red-50 border-red-200">
+                    <div className="text-center">
+                      <div className="text-3xl mb-3">⏰</div>
+                      <Heading level="h3" color="default" className="mb-3">
+                        Limited Time Offer
+                      </Heading>
+                      <Text variant="body" color="muted">
+                        Founding member pricing ends soon. Next cohort will be $999.
+                      </Text>
+                    </div>
+                  </Card>
+                </div>
+              </Animated>
+            </div>
+          </div>
+        </Container>
+      </Section>
     </main>
+  );
+}
+
+export default function PayPage() {
+  return (
+    <Suspense fallback={
+      <Section background="white">
+        <Container>
+          <div className="text-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <Text variant="body" color="muted">Loading...</Text>
+          </div>
+        </Container>
+      </Section>
+    }>
+      <PayPageContent />
+    </Suspense>
   );
 }

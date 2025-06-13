@@ -101,7 +101,7 @@ export default function CloneSection() {
           className="flex justify-start w-full md:w-auto"
         >
           <button
-            onClick={() => router.push("/signup")}
+            onClick={() => router.push("/")}
             className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 md:py-4 md:px-8 rounded-lg text-base md:text-lg shadow-xl transform transition-all duration-200 hover:scale-105 hover:shadow-2xl whitespace-nowrap text-center"
           >
             Start cloning winners →

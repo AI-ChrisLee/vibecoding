@@ -120,7 +120,7 @@ export default function CTASection() {
           viewport={{ once: true }}
           className="flex flex-col items-start gap-4 md:gap-6"
         >
-          <JoinCloneAccessBtn onClick={() => window.location.href = "/signup"} />
+                          <JoinCloneAccessBtn onClick={() => window.location.href = "/"} />
           <div className="flex items-center gap-4 text-blue-200 text-sm">
             <span className="inline-flex items-center gap-1">
               ⚡ <span className="font-medium">Limited spots</span>

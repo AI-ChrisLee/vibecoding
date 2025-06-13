@@ -56,7 +56,7 @@ export default function RealitySection() {
           className="mt-10 md:mt-12 flex justify-start w-full md:w-auto"
         >
           <a 
-            href="/signup"
+                          href="/"
             className="w-full md:w-auto inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 md:py-4 md:px-8 rounded-lg text-base md:text-lg shadow-xl transform transition-all duration-200 hover:scale-105 hover:shadow-2xl whitespace-nowrap text-center"
           >
             Break the cycle. Start cloning →

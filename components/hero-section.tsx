@@ -4,6 +4,91 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+// Simple form component to replace the deleted SimpleSignupForm
+function SignupForm() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !email.trim()) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      // Save customer to database
+      const response = await fetch('/api/save-customer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          first_name: name.trim(), 
+          email: email.trim() 
+        })
+      });
+
+      if (response.ok) {
+        // Redirect to payment page with customer info
+        window.location.href = `/pay?name=${encodeURIComponent(name.trim())}&email=${encodeURIComponent(email.trim())}`;
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <input
+          type="text"
+          placeholder="Your name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="flex-1 px-4 py-3 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
+          disabled={isLoading}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="flex-1 px-4 py-3 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
+          disabled={isLoading}
+          required
+        />
+      </div>
+      
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="w-full bg-white text-blue-600 font-bold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {isLoading ? 'Processing...' : 'Get Instant Access → $497'}
+      </button>
+      
+      {error && (
+        <p className="text-red-200 text-sm text-center">{error}</p>
+      )}
+      
+      <p className="text-blue-200 text-xs text-center">
+        21-day money-back guarantee • No questions asked
+      </p>
+    </form>
+  );
+}
+
 // Countdown Timer Component
 function CountdownTimer({ targetDate }: { targetDate: string }) {
   const [mounted, setMounted] = useState(false);
@@ -166,30 +251,14 @@ export default function HeroSection() {
         Cursor × Supabase × Vercel. One ruthless build sprint.
       </motion.h2>
 
-      {/* CTA Button */}
+      {/* CTA Form */}
       <motion.div 
         className="flex flex-col items-start md:items-center gap-4 md:gap-6 mb-10 md:mb-12 w-full md:w-auto"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
       >
-        <a 
-          href="/signup"
-          className="w-full md:w-auto bg-white hover:bg-gray-50 text-blue-700 font-bold py-4 px-6 md:py-5 md:px-10 rounded-lg text-lg md:text-xl shadow-xl transform transition-all duration-200 hover:scale-105 hover:shadow-2xl border-2 border-white whitespace-nowrap focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50 text-center"
-          role="button"
-          aria-label="Join Clone Accelerator course"
-        >
-          🔥 Join Clone Accelerator →
-        </a>
-        <p className="text-blue-200 text-sm self-start md:self-center flex items-center gap-2">
-          <span className="inline-flex items-center gap-1">
-            ⚡ <span className="font-medium">Limited spots</span>
-          </span>
-          <span aria-hidden="true">·</span>
-          <span className="inline-flex items-center gap-1">
-            💰 <span className="font-medium">Money-back guarantee</span>
-          </span>
-        </p>
+        <SignupForm />
       </motion.div>
 
       {/* Hero Image */}

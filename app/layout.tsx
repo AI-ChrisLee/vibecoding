@@ -60,7 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 requestIdleCallback(() => {
                   const link = document.createElement('link');
                   link.rel = 'prefetch';
-                  link.href = '/signup';
+                  link.href = '/';
                   document.head.appendChild(link);
                 });
               }

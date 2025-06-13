@@ -36,69 +36,47 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { email, sessionId, amount, status } = body;
+    const { email } = await request.json();
 
-    // If this is just a payment check (no sessionId), check payment status
-    if (email && !sessionId) {
-      try {
-        const { data: payment, error } = await supabase
-          .from('payments')
-          .select('status')
-          .eq('email', email)
-          .eq('status', 'succeeded')
-          .single();
-
-        if (error && error.code !== 'PGRST116') {
-          console.error('Payment check error:', error);
-          // Return false but don't fail completely
-          return NextResponse.json({ hasPaid: false });
-        }
-
-        return NextResponse.json({ 
-          hasPaid: !!payment,
-          status: payment?.status || 'no_payment'
-        });
-      } catch (checkError) {
-        console.error('Payment check failed:', checkError);
-        // Fallback: assume no payment
-        return NextResponse.json({ hasPaid: false });
-      }
-    }
-
-    // Record new payment
-    if (!email || !sessionId) {
+    if (!email) {
       return NextResponse.json(
-        { success: false, error: 'Missing required fields' },
+        { success: false, error: 'Email is required' },
         { status: 400 }
       );
     }
 
-    // Record the payment
-    const { data, error } = await supabase
-      .from('payments')
-      .insert({
-        email,
-        stripe_session_id: sessionId,
-        amount,
-        status: status || 'succeeded',
-        payment_date: new Date().toISOString()
-      })
-      .select()
+    // Check customer's payment status
+    const { data: customer, error } = await supabase
+      .from('customers')
+      .select('paid, stripe_payment_id, amount_paid, paid_at, first_name, last_name')
+      .eq('email', email)
       .single();
 
     if (error) {
-      console.error('Payment record error:', error);
+      console.error('Database error:', error);
       return NextResponse.json(
-        { success: false, error: 'Failed to record payment' },
-        { status: 500 }
+        { success: false, error: 'Customer not found' },
+        { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({
+      success: true,
+      hasPaid: customer.paid,
+      customer: {
+        name: `${customer.first_name} ${customer.last_name}`,
+        email: email,
+        paid: customer.paid,
+        paymentInfo: customer.paid ? {
+          stripe_payment_id: customer.stripe_payment_id,
+          amount_paid: customer.amount_paid,
+          paid_at: customer.paid_at
+        } : null
+      }
+    });
 
   } catch (error) {
-    console.error('Payment record error:', error);
+    console.error('Check payment error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

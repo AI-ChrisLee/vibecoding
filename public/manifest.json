@@ -1,0 +1,16 @@
+{
+  "name": "Vibe Coding Clone Accelerator",
+  "short_name": "Vibe Coding",
+  "description": "Clone $10M Apps in 21 Days — or Your Money Back",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e40af",
+  "theme_color": "#1e40af",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+} 

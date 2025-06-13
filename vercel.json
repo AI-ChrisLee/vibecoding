@@ -1,15 +1,12 @@
 {
   "functions": {
-    "app/api/webhook/stripe/route.ts": {
-      "maxDuration": 30
-    },
-    "app/api/stripe-webhook/route.ts": {
+    "app/api/webhooks/stripe/route.ts": {
       "maxDuration": 30
     }
   },
   "headers": [
     {
-      "source": "/api/webhook/(.*)",
+      "source": "/api/webhooks/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
@@ -24,6 +21,12 @@
           "value": "Content-Type, Authorization, stripe-signature"
         }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/webhooks/stripe",
+      "destination": "/api/webhooks/stripe"
     }
   ]
 } 

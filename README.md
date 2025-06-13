@@ -1,36 +1,142 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Universal Payment & Email System
 
-## Getting Started
+A Next.js application with Stripe payments and Resend email automation - designed to be reusable for any project.
 
-First, run the development server:
+## ✨ Features
 
+- 💳 **Stripe Integration** - Secure payment processing
+- 📧 **Resend Email** - Universal email automation
+- 🗄️ **Supabase Database** - Customer data storage
+- 🎨 **Modern UI** - Tailwind CSS + Framer Motion
+- 📱 **Responsive Design** - Works on all devices
+- 🔒 **Secure Webhooks** - Automated payment processing
+
+## 🚀 Quick Start
+
+### 1. Clone & Install
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo>
+cd vibe-site
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Environment Setup
+Create `.env.local` with:
+```bash
+# Database
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Stripe
+STRIPE_PUBLISHABLE_KEY=pk_test_your_key
+STRIPE_SECRET_KEY=sk_test_your_key
+STRIPE_WEBHOOK_SECRET=whsec_your_secret
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Email - Resend (Universal)
+RESEND_API_KEY=re_your_api_key
 
-## Learn More
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Database Setup
+```sql
+-- Simple customers table
+CREATE TABLE customers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  first_name TEXT,
+  email TEXT UNIQUE NOT NULL,
+  paid BOOLEAN DEFAULT FALSE,
+  stripe_payment_id TEXT,
+  amount_paid INTEGER,
+  created_at TIMESTAMP DEFAULT NOW(),
+  paid_at TIMESTAMP
+);
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Run Development Server
+```bash
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📧 Email System
 
-## Deploy on Vercel
+This project uses **Resend** for universal email automation:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- ✅ **Payment confirmations** - Automatic after successful payment
+- ✅ **Professional templates** - Responsive HTML emails
+- ✅ **Customizable** - Easy to modify for any project
+- ✅ **Reliable delivery** - 99.9% uptime
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `RESEND_SETUP.md` for detailed configuration.
+
+## 🔧 Customization
+
+### Change Project Details
+Edit `lib/resend-workflow.ts`:
+```typescript
+// Update project name and email
+const workflow = new UniversalEmailWorkflow(
+  'noreply@yourdomain.com',
+  'Your Project Name'
+);
+```
+
+### Modify Email Templates
+Update the HTML template in `getPaymentConfirmationTemplate()` method.
+
+### Add New Email Types
+```typescript
+await emailService.sendCustomEmail(
+  'customer@example.com',
+  'Welcome!',
+  '<h1>Your custom HTML</h1>'
+);
+```
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+1. Connect your GitHub repo
+2. Add environment variables
+3. Deploy automatically
+
+### Other Platforms
+- Add environment variables
+- Set build command: `npm run build`
+- Set start command: `npm start`
+
+## 📁 Project Structure
+
+```
+├── app/
+│   ├── api/webhooks/stripe/    # Payment webhooks
+│   ├── pay/                    # Payment page
+│   └── thanks/                 # Success page
+├── lib/
+│   ├── resend-workflow.ts      # Email automation
+│   └── supabase-client.ts      # Database client
+├── components/                 # UI components
+└── docs/                      # Documentation
+```
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15
+- **Database**: Supabase
+- **Payments**: Stripe
+- **Email**: Resend
+- **Styling**: Tailwind CSS
+- **Animation**: Framer Motion
+- **Language**: TypeScript
+
+## 🆘 Support
+
+- 📧 Email: me@aichrislee.com
+- 📖 Docs: Check `RESEND_SETUP.md`
+- 🐛 Issues: Create GitHub issue
+
+---
+
+**Ready to use for any project!** 🎉 Just update the project name and customize the templates.
